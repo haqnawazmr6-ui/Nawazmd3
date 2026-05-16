@@ -62,7 +62,7 @@ cmd({
             document: { url: vid.mp4 },
             fileName: `${vid.title}.mp4`,
             mimetype: 'video/mp4',
-            caption: `🎬 *${vid.title}*\n\n*© ᴘᴏᴡᴇʀᴇᴅ ʙʏ Jᴀᴡᴀᴅ TᴇᴄʜX*`
+            caption: `🎬 *${vid.title}*\n\n*© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᏁᎪᎳᎪᏃ ᎢᎬᏟᎻᏐ*`
         }, { quoted: mek });
 
         // ✅ React success
