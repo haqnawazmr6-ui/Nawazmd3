@@ -1,4 +1,4 @@
- const config = require('../config')
+const config = require('../config')
 const { cmd, commands } = require('../command');
 const path = require('path');
 const os = require("os")
@@ -6,50 +6,66 @@ const fs = require('fs');
 const {runtime} = require('../lib/functions')
 const axios = require('axios')
 
-// Helper function for small caps text
+// Small Caps
 const toSmallCaps = (text) => {
     if (!text || typeof text !== 'string') return '';
+
     const smallCapsMap = {
-        'a': 'ᴀ', 'b': 'ʙ', 'c': 'ᴄ', 'd': 'ᴅ', 'e': 'ᴇ', 'f': 'ғ', 'g': 'ɢ', 'h': 'ʜ', 'i': 'ɪ',
-        'j': 'ᴊ', 'k': 'ᴋ', 'l': 'ʟ', 'm': 'ᴍ', 'n': 'ɴ', 'o': 'ᴏ', 'p': 'ᴘ', 'q': 'ǫ', 'r': 'ʀ',
-        's': 's', 't': 'ᴛ', 'u': 'ᴜ', 'v': 'ᴠ', 'w': 'ᴡ', 'x': 'x', 'y': 'ʏ', 'z': 'ᴢ',
-        'A': 'ᴀ', 'B': 'ʙ', 'C': 'ᴄ', 'D': 'ᴅ', 'E': 'ᴇ', 'F': 'ғ', 'G': 'ɢ', 'H': 'ʜ', 'I': 'ɪ',
-        'J': 'ᴊ', 'K': 'ᴋ', 'L': 'ʟ', 'M': 'ᴍ', 'N': 'ɴ', 'O': 'ᴏ', 'P': 'ᴘ', 'Q': 'ǫ', 'R': 'ʀ',
-        'S': 's', 'T': 'ᴛ', 'U': 'ᴜ', 'V': 'ᴠ', 'W': 'ᴡ', 'X': 'x', 'Y': 'ʏ', 'Z': 'ᴢ'
+        'a': 'ᴀ', 'b': 'ʙ', 'c': 'ᴄ', 'd': 'ᴅ', 'e': 'ᴇ',
+        'f': 'ғ', 'g': 'ɢ', 'h': 'ʜ', 'i': 'ɪ', 'j': 'ᴊ',
+        'k': 'ᴋ', 'l': 'ʟ', 'm': 'ᴍ', 'n': 'ɴ', 'o': 'ᴏ',
+        'p': 'ᴘ', 'q': 'ǫ', 'r': 'ʀ', 's': 's', 't': 'ᴛ',
+        'u': 'ᴜ', 'v': 'ᴠ', 'w': 'ᴡ', 'x': 'x', 'y': 'ʏ',
+        'z': 'ᴢ',
+
+        'A': 'ᴀ', 'B': 'ʙ', 'C': 'ᴄ', 'D': 'ᴅ', 'E': 'ᴇ',
+        'F': 'ғ', 'G': 'ɢ', 'H': 'ʜ', 'I': 'ɪ', 'J': 'ᴊ',
+        'K': 'ᴋ', 'L': 'ʟ', 'M': 'ᴍ', 'N': 'ɴ', 'O': 'ᴏ',
+        'P': 'ᴘ', 'Q': 'ǫ', 'R': 'ʀ', 'S': 's', 'T': 'ᴛ',
+        'U': 'ᴜ', 'V': 'ᴠ', 'W': 'ᴡ', 'X': 'x', 'Y': 'ʏ',
+        'Z': 'ᴢ'
     };
+
     return text.split('').map(char => smallCapsMap[char] || char).join('');
 };
 
-// Format category with sidebar design from Menu 2
+// New Stylish Category Design
 const formatCategory = (category, cmds) => {
-    // Filter out commands with empty or undefined patterns
-    const validCmds = cmds.filter(cmd => cmd.pattern && cmd.pattern.trim() !== '');
-    
-    if (validCmds.length === 0) return ''; // Skip empty categories
-    
-    let title = `\n╔══❰ ${toSmallCaps(category.toUpperCase())} ❱══╗\n║\n`;
+
+    const validCmds = cmds.filter(cmd =>
+        cmd.pattern && cmd.pattern.trim() !== ''
+    );
+
+    if (validCmds.length === 0) return '';
+
+    let title = `
+╭━━━〔 ${toSmallCaps(category.toUpperCase())} 〕━━━⬣`;
+
     let body = validCmds.map(cmd => {
         const commandName = cmd.pattern || '';
-        return `║ ─ ${toSmallCaps(commandName)}`;
+        return `┃ ✦ ${toSmallCaps(commandName)}`;
     }).join('\n');
-    let footer = `\n║\n╚══════════════════╝`;
-    return `${title}${body}${footer}`;
+
+    let footer = `╰━━━━━━━━━━━━━━━━⬣`;
+
+    return `${title}\n${body}\n${footer}`;
 };
 
-// Function to validate image URL
+// Check Image URL
 const isValidImageUrl = (url) => {
+
     if (!url || typeof url !== 'string' || url.trim() === '') {
         return false;
     }
-    
+
     const urlLower = url.toLowerCase();
-    
-    // Check image extensions
+
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+
     if (imageExtensions.some(ext => urlLower.endsWith(ext))) {
         return true;
     }
-    
+
     return false;
 };
 
@@ -62,106 +78,193 @@ cmd({
     react: "⚡",
     filename: __filename
 },
-async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, userConfig }) => {
+
+async (conn, mek, m, {
+    from,
+    quoted,
+    body,
+    isCmd,
+    command,
+    args,
+    q,
+    isGroup,
+    sender,
+    senderNumber,
+    botNumber2,
+    botNumber,
+    pushname,
+    isMe,
+    isOwner,
+    groupMetadata,
+    groupName,
+    participants,
+    groupAdmins,
+    isBotAdmins,
+    isAdmins,
+    reply,
+    userConfig
+}) => {
+
     try {
-        // Show typing presence before processing
+
         await conn.sendPresenceUpdate('composing', from);
-        
+
         let totalCommands = Object.keys(commands).length;
-        
-        // Get all unique categories and filter out undefined/null categories
-        const categories = [...new Set(Object.values(commands).map(c => c.category))].filter(cat => 
+
+        const categories = [
+            ...new Set(
+                Object.values(commands).map(c => c.category)
+            )
+        ].filter(cat =>
             cat && cat.trim() !== '' && cat !== 'undefined'
         );
-        
-        // Organize commands by category and filter out empty categories
+
         const categorized = {};
+
         categories.forEach(cat => {
-            const categoryCommands = Object.values(commands).filter(c => c.category === cat);
-            // Only add category if it has valid commands
-            const validCommands = categoryCommands.filter(cmd => cmd.pattern && cmd.pattern.trim() !== '');
+
+            const categoryCommands = Object.values(commands)
+                .filter(c => c.category === cat);
+
+            const validCommands = categoryCommands.filter(cmd =>
+                cmd.pattern && cmd.pattern.trim() !== ''
+            );
+
             if (validCommands.length > 0) {
                 categorized[cat] = validCommands;
             }
         });
 
-        // Build menu sections - only for categories that have commands
         let menuSections = '';
+
         for (const [category, cmds] of Object.entries(categorized)) {
+
             if (cmds && cmds.length > 0) {
+
                 const section = formatCategory(category, cmds);
+
                 if (section !== '') {
-                    menuSections += section;
+                    menuSections += section + '\n';
                 }
             }
         }
 
-        // Get all values from userConfig with fallback to config
-        const BOT_NAME = userConfig?.BOT_NAME || config.BOT_NAME || "Bot";
-        const OWNER_NAME = userConfig?.OWNER_NAME || config.OWNER_NAME || "Owner";
-        const PREFIX = userConfig?.PREFIX || config.PREFIX || ".";
-        const MODE = userConfig?.MODE || config.MODE || "private";
-        const VERSION = userConfig?.VERSION || config.VERSION || "1.0.0";
-        const DESCRIPTION = userConfig?.DESCRIPTION || config.DESCRIPTION || "";
-        
-        // Get BOT_IMAGE from userConfig first, then config.BOT_IMAGE, then config.BOT_MEDIA_URL
-        const BOT_IMAGE = userConfig?.BOT_IMAGE || userConfig?.BOT_MEDIA_URL || config.BOT_IMAGE || config.BOT_MEDIA_URL;
-        
-        // Main menu text with sidebar design from Menu 2
-        let dec = `╔══════════════════╗
-║  ${BOT_NAME}
-╚══════════════════╝
+        const BOT_NAME =
+            userConfig?.BOT_NAME ||
+            config.BOT_NAME ||
+            "Bot";
 
-╔════❰ 🤖 ʙᴏᴛ ɪɴғᴏ ❱════╗
-║ 👑 ${toSmallCaps('Owner')}: ${OWNER_NAME}
-║ 📜 ${toSmallCaps('Commands')}: ${totalCommands}
-║ ⏱️ ${toSmallCaps('Runtime')}: ${runtime(process.uptime())}
-║ 📦 ${toSmallCaps('Prefix')}: ${PREFIX}
-║ ⚙️ ${toSmallCaps('Mode')}: ${MODE}
-║ 🏷️ ${toSmallCaps('Version')}: ${VERSION}
-╚══════════════════╝
+        const OWNER_NAME =
+            userConfig?.OWNER_NAME ||
+            config.OWNER_NAME ||
+            "Owner";
+
+        const PREFIX =
+            userConfig?.PREFIX ||
+            config.PREFIX ||
+            ".";
+
+        const MODE =
+            userConfig?.MODE ||
+            config.MODE ||
+            "private";
+
+        const VERSION =
+            userConfig?.VERSION ||
+            config.VERSION ||
+            "1.0.0";
+
+        const DESCRIPTION =
+            userConfig?.DESCRIPTION ||
+            config.DESCRIPTION ||
+            "";
+
+        const BOT_IMAGE =
+            userConfig?.BOT_IMAGE ||
+            userConfig?.BOT_MEDIA_URL ||
+            config.BOT_IMAGE ||
+            config.BOT_MEDIA_URL;
+
+        // Main Menu Design
+        let dec = `
+╭────────────────⬣
+│     ${toSmallCaps(BOT_NAME)}
+╰────────────────⬣
+
+╭━━〔 🤖 ʙᴏᴛ ɪɴғᴏ 〕━━⬣
+┃ 👑 ᴏᴡɴᴇʀ : ${toSmallCaps(OWNER_NAME)}
+┃ 📜 ᴄᴏᴍᴍᴀɴᴅs : ${totalCommands}
+┃ ⏱️ ʀᴜɴᴛɪᴍᴇ : ${runtime(process.uptime())}
+┃ 📦 ᴘʀᴇғɪx : ${PREFIX}
+┃ ⚙️ ᴍᴏᴅᴇ : ${MODE}
+┃ 🏷️ ᴠᴇʀsɪᴏɴ : ${VERSION}
+╰━━━━━━━━━━━━━━━━⬣
 ${menuSections}
 
-> ${DESCRIPTION || ''}`;
+> ${DESCRIPTION || ''}
+`;
 
-        // Determine which image to use
         let imageToUse;
-        const localImagePath = path.join(__dirname, '../lib/ERFAN.jpg');
-        
-        // Check if BOT_IMAGE is a valid image URL
+
+        const localImagePath = path.join(
+            __dirname,
+            '../lib/ERFAN.jpg'
+        );
+
         if (isValidImageUrl(BOT_IMAGE)) {
+
             try {
-                // Check if server is accessible (timeout after 3 seconds)
-                await axios.head(BOT_IMAGE, { timeout: 3000 });
-                // Server is up, use the URL image
+
+                await axios.head(BOT_IMAGE, {
+                    timeout: 3000
+                });
+
                 imageToUse = BOT_IMAGE;
+
             } catch (serverError) {
-                // Server is down or inaccessible, use local image
-                console.log('Image server down, using local image:', serverError.message);
+
+                console.log(
+                    'Image server down, using local image:',
+                    serverError.message
+                );
+
                 imageToUse = localImagePath;
             }
+
         } else {
-            // Invalid image format, use local image
+
             imageToUse = localImagePath;
         }
 
-        await conn.sendMessage(from, { 
+        await conn.sendMessage(from, {
+
             image: { url: imageToUse },
-            caption: dec, 
-            contextInfo: { 
-                mentionedJid: [m.sender], 
-                forwardingScore: 999, 
-                isForwarded: true, 
-                forwardedNewsletterMessageInfo: { 
-                    newsletterJid: '120363416743041101@newsletter', 
-                    newsletterName: BOT_NAME, 
-                    serverMessageId: 143 
-                } 
-            } 
+
+            caption: dec,
+
+            contextInfo: {
+                mentionedJid: [m.sender],
+
+                forwardingScore: 999,
+
+                isForwarded: true,
+
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid:
+                        '120363402493709861@newsletter',
+
+                    newsletterName: BOT_NAME,
+
+                    serverMessageId: 143
+                }
+            }
+
         }, { quoted: mek });
 
-    } catch (e) { 
-        console.log(e); 
-        reply(`Error: ${e}`); 
-    } 
-});
+    } catch (e) {
+
+        console.log(e);
+
+        reply(`Error: ${e}`);
+    }
+}); 
