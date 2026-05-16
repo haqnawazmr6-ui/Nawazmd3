@@ -128,7 +128,7 @@ ${menuSections}
                 forwardingScore: 999,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: "120363402493709861@newsletter",
-                    newsletterName: "📢 YOUR NEWSLETTER NAME HERE",
+                    newsletterName: "NAWAZ-MD",
                     serverMessageId: 1
                 }
             }
