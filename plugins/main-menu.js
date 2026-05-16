@@ -19,16 +19,19 @@ async (conn, mek, m, { from, reply, userConfig }) => {
 
         await conn.sendPresenceUpdate('composing', from);
 
-        let totalCommands = Object.values(commands).filter(c => c.pattern).length;
+        // SAFE COMMAND LIST (NO CRASH FIX)
+        let allCmds = Object.values(commands).filter(c => c && typeof c === 'object' && c.pattern);
 
-        const categories = [...new Set(Object.values(commands).map(c => c.category))]
-        .filter(c => c && c !== 'undefined');
+        let totalCommands = allCmds.length;
+
+        const categories = [...new Set(allCmds.map(c => c?.category))]
+            .filter(c => c && c !== 'undefined');
 
         const categorized = {};
 
         categories.forEach(cat => {
-            let cmds = Object.values(commands)
-            .filter(c => c.category === cat && c.pattern);
+
+            let cmds = allCmds.filter(c => c.category === cat && c.pattern);
 
             if (cmds.length) categorized[cat] = cmds;
         });
@@ -50,7 +53,7 @@ ${cmds.map(c => `┃ ✦ ${c.pattern}`).join('\n')}
         const DESCRIPTION = userConfig?.DESCRIPTION || config.DESCRIPTION || "";
 
         const dec = `
-┏━━━〔 🤖 NAWAZ MD MENU 〕━━━┓
+┏━━━〔 🤖 ${BOT_NAME.toUpperCase()} MENU 〕━━━┓
 
 ┃ 👤 Owner   : ${OWNER_NAME}
 ┃ 📌 Prefix  : ${PREFIX}
@@ -64,15 +67,20 @@ ${cmds.map(c => `┃ ✦ ${c.pattern}`).join('\n')}
 ${menuSections}
 
 ┏━━━〔 ✨ DESCRIPTION 〕━━━┓
-┃ ${DESCRIPTION || "Nawaz MD Bot"}
+┃ ${DESCRIPTION || "Bot Menu"}
 ┗━━━━━━━━━━━━━━━━━━━━━━┛
 `;
 
-        let imagePath = path.join(__dirname, '../lib/jawadmd.jpg');
+        // SAFE IMAGE LOAD (BOT DP + FALLBACK)
+        let imageMsg = await conn.profilePictureUrl(conn.user.id, 'image')
+            .catch(() => null);
 
-        let imageMsg = fs.existsSync(imagePath)
-            ? fs.readFileSync(imagePath)
-            : null;
+        if (!imageMsg) {
+            let imagePath = path.join(__dirname, '../lib/jawadmd.jpg');
+            imageMsg = fs.existsSync(imagePath)
+                ? fs.readFileSync(imagePath)
+                : null;
+        }
 
         await conn.sendMessage(from, {
             image: imageMsg,
