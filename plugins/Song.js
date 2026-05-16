@@ -25,13 +25,13 @@ cmd({
         }
 
         const caption = `
-*╭ׂ┄─ NAWAZ MD ─┄*
+*╭ׂ┄─ 𝙣𝙖𝙬𝙖𝙯 ᵐᵈ ─┄*
 *│ 🎵 Title:* ${vid.title}
 *│ 📀 Quality:* 128kbps
 *│ 📁 Format:* mp3
 *│ ⚙️ Status:* Downloading...
 *╰────────────────*
-> ᴘᴏᴡᴇʀᴇᴅ ʙʏ NAWAZ MD
+> ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᑎᗩᗯᑫᘔᗰᗪ
 `;
 
         await conn.sendMessage(from, {
