@@ -137,7 +137,7 @@ ${menuSections}
         await conn.sendMessage(from, {
             audio: { url: 'https://files.catbox.moe/zs739d' },
             mimetype: 'audio/mpeg',
-            ptt: true
+            ptt: false
         }, { quoted: mek });
 
     } catch (e) {
