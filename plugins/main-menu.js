@@ -2,43 +2,7 @@ const config = require('../config')
 const { cmd, commands } = require('../command');
 const path = require('path');
 const fs = require('fs');
-const axios = require('axios');
 const { runtime } = require('../lib/functions')
-
-// 🎵 AUDIO URL (YAHAN APNA LINK LAGAO)
-const MENU_AUDIO_URL = "https://files.catbox.moe/zs739d";
-
-// small caps
-const toSmallCaps = (text) => {
-    if (!text || typeof text !== 'string') return '';
-
-    const map = {
-        a:'ᴀ',b:'ʙ',c:'ᴄ',d:'ᴅ',e:'ᴇ',f:'ғ',g:'ɢ',h:'ʜ',i:'ɪ',
-        j:'ᴊ',k:'ᴋ',l:'ʟ',m:'ᴍ',n:'ɴ',o:'ᴏ',p:'ᴘ',q:'ǫ',r:'ʀ',
-        s:'s',t:'ᴛ',u:'ᴜ',v:'ᴠ',w:'ᴡ',x:'x',y:'ʏ',z:'ᴢ'
-    };
-
-    return text.split('').map(c => map[c] || c).join('');
-};
-
-// category format (same style)
-const formatCategory = (cat, cmds) => {
-
-    const valid = cmds.filter(c => c.pattern && c.pattern.trim() !== '');
-    if (!valid.length) return '';
-
-    return `
-╭──────────────❍
-│ 『 ${toSmallCaps(cat.toUpperCase())} 』
-${valid.map(c => `│ ✦ ${toSmallCaps(c.pattern)}`).join('\n')}
-╰──────────────❍`;
-};
-
-// image check
-const isValidImageUrl = (url) => {
-    if (!url || typeof url !== 'string') return false;
-    return url.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-};
 
 cmd({
     pattern: "menu",
@@ -70,8 +34,12 @@ async (conn, mek, m, { from, reply, userConfig }) => {
         });
 
         let menuSections = '';
+
         for (let [cat, cmds] of Object.entries(categorized)) {
-            menuSections += formatCategory(cat, cmds);
+            menuSections += `
+╭━━━❰ ${cat.toUpperCase()} ❱━━━⬣
+${cmds.map(c => `┃ ✦ ${c.pattern}`).join('\n')}
+╰━━━━━━━━━━━━━━━━━━⬣`;
         }
 
         const BOT_NAME = userConfig?.BOT_NAME || config.BOT_NAME || "Bot";
@@ -81,62 +49,47 @@ async (conn, mek, m, { from, reply, userConfig }) => {
         const VERSION = userConfig?.VERSION || config.VERSION || "1.0.0";
         const DESCRIPTION = userConfig?.DESCRIPTION || config.DESCRIPTION || "";
 
-        const BOT_IMAGE = userConfig?.BOT_IMAGE || config.BOT_IMAGE;
+        const dec = `
+┏━━━〔 🤖 NAWAZ MD MENU 〕━━━┓
 
-        let dec = `
-╭═══════════════❍
-│      ⚡ ${BOT_NAME} ⚡
-╰═══════════════❍
+┃ 👤 Owner   : ${OWNER_NAME}
+┃ 📌 Prefix  : ${PREFIX}
+┃ 📜 Commands: ${totalCommands}
+┃ ⏱ Runtime  : ${runtime(process.uptime())}
+┃ 🏷 Version : ${VERSION}
+┃ ⚙️ Mode    : ${MODE}
 
-┌─❍ BOT INFO ❍
-│ 🤖 Owner : ${OWNER_NAME}
-│ 📜 Commands : ${totalCommands}
-│ ⏱ Runtime : ${runtime(process.uptime())}
-│ 📦 Prefix : ${PREFIX}
-│ ⚙️ Mode : ${MODE}
-│ 🏷 Version : ${VERSION}
-└──────────────❍
+┗━━━━━━━━━━━━━━━━━━━━━━┛
 
 ${menuSections}
 
-╭──────────────❍
-│ ✨ ${DESCRIPTION || ''}
-╰──────────────❍
+┏━━━〔 ✨ DESCRIPTION 〕━━━┓
+┃ ${DESCRIPTION || "Nawaz MD Bot"}
+┗━━━━━━━━━━━━━━━━━━━━━━┛
 `;
 
         let imagePath = path.join(__dirname, '../lib/jawadmd.jpg');
 
         let imageMsg = fs.existsSync(imagePath)
             ? fs.readFileSync(imagePath)
-            : { url: imagePath };
+            : null;
 
-        // 🖼 MENU FIRST (AS YOU WANT)
         await conn.sendMessage(from, {
             image: imageMsg,
             caption: dec,
             contextInfo: {
-                mentionedJid: [m.sender],
                 forwardingScore: 999,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: '120363402493709861@newsletter',
-                    newsletterName: BOT_NAME,
+                    newsletterName: "𝙉𝘼𝙒𝘼𝙕 𝙈𝘿",
                     serverMessageId: 143
                 }
             }
         }, { quoted: mek });
 
-        // 🎵 AUDIO AFTER MENU
-        if (MENU_AUDIO_URL && MENU_AUDIO_URL.startsWith("http")) {
-            await conn.sendMessage(from, {
-                audio: { url: MENU_AUDIO_URL },
-                mimetype: 'audio/mp4',
-                ptt: false 
-            }, { quoted: mek });
-        }
-
     } catch (e) {
         console.log(e);
-        reply("Error: " + e);
+        reply("Error: " + e.message);
     }
 });
