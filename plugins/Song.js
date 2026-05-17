@@ -1,112 +1,86 @@
-const { cmd } = require('../command');
-const axios = require('axios');
-const yts = require('yt-search');
+const { cmd } = require('../command')
+const axios = require('axios')
+const yts = require('yt-search')
 
+// ═══════════════════════════════════════════════════════════
+// 🎵 SONG COMMAND (SINGLE API - EliteProTech)
+// ═══════════════════════════════════════════════════════════
 cmd({
     pattern: "song",
     alias: ["play", "music", "audio", "aa"],
     desc: "Download YouTube song",
     category: "download",
-    react: "🎧",
+    react: "🚀",
     filename: __filename
 }, async (conn, mek, m, { from, reply, text }) => {
-
     try {
-
         if (!text) {
-            return reply("❌ Please provide song name\nExample: .song Shape of You");
+            return reply("❌ Please provide song name\nExample: .song Shape of You")
         }
 
-        const search = await yts(text);
-        const vid = search?.videos?.[0];
-
-        if (!vid) {
-            return reply("❌ No song found!");
+        // 🔍 YouTube search
+        const search = await yts(text)
+        if (!search.videos || !search.videos.length) {
+            return reply("❌ No song found!")
         }
 
+        const vid = search.videos[0]
+
+        // 🎨 🅽︎🅰︎🆆︎🅰︎🆉︎-🄼🄳 STYLE BOX
         const caption = `
-╔═━──────━▒ ۞ ▒━──────━═╗
-        🎧 NAWAZ MD
-╚═━──────━▒ ۞ ▒━──────━═╝
+*╭ׂ┄─̇─̣┄─̇─̣┄─̇─̣┄─̇─̣┄─̇─̣─̇─̣─᛭*
+*│ ╌─̇─̣⊰  🅽︎🅰︎🆆︎🅰︎🆉︎-🄼🄳 ⊱┈─̇─̣╌*
+*│─̇─̣┄┄┄┄┄┄┄┄┄┄┄┄┄─̇─̣*
+*│❀ 🎵 𝐓𝐢𝐭𝐥𝐞:* ${vid.title}
+*│❀ 📀 𝐐𝐮𝐚𝐥𝐢𝐭𝐲:* 128kbps
+*│❀ 📁 𝐅𝐨𝐫𝐦𝐚𝐭:* mp3
+*│❀ ⚙️ 𝐒𝐭𝐚𝐭𝐮𝐬:* Downloading...
+*╰┄─̣┄─̇─̣┄─̇─̣┄─̇─̣┄─̇─̣─̇─̣─᛭*
+> ᴘᴏᴡᴇʀᴇᴅ ʙʏ 🅽︎🅰︎🆆︎🅰︎🆉︎🄼🄳`
 
-🎵 Title   : ${vid.title}
-⏱ Duration: ${vid.timestamp}
-👁 Views   : ${vid.views}
-📀 Quality : 128kbps MP3
-⚡ Status  : Audio Loading...
-`;
-
-        // THUMBNAIL MESSAGE (NEWSLETTER STYLE LOOK)
         await conn.sendMessage(from, {
             image: { url: vid.thumbnail },
-            caption,
-            contextInfo: {
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: "120363402493709861@newsletter",
-                    newsletterName: "NAWAZ MD MUSIC",
-                    serverMessageId: 1
-                },
-                externalAdReply: {
-                    title: "🎧 NAWAZ MD MUSIC",
-                    body: vid.title,
-                    thumbnailUrl: vid.thumbnail,
-                    sourceUrl: vid.url,
-                    mediaType: 1,
-                    renderLargerThumbnail: true,
-                    showAdAttribution: false
-                }
+            caption
+        }, { quoted: mek })
+
+        // ═══════════════════════════════════════════════════════════
+        // 🔷 API: EliteProTech API (Direct MP3)
+        // ═══════════════════════════════════════════════════════════
+        try {
+            const apiUrl = `https://eliteprotech-apis.zone.id/ytmp3?url=${encodeURIComponent(vid.url)}`
+            const res = await axios.get(apiUrl, { timeout: 30000 })
+
+            if (!res.data?.status || !res.data?.result?.download) {
+                await conn.sendMessage(from, { react: { text: '❌', key: m.key } })
+                return reply("❌ API Error! Please try again later.")
             }
-        }, { quoted: mek });
 
-        const apiUrl = `https://eliteprotech-apis.zone.id/ytmp3?url=${encodeURIComponent(vid.url)}`;
+            const audioUrl = res.data.result.download
+            const audioRes = await axios.get(audioUrl, {
+                responseType: 'arraybuffer',
+                timeout: 60000
+            })
+            const audioBuffer = Buffer.from(audioRes.data)
 
-        const res = await axios.get(apiUrl, { timeout: 30000 });
+            await conn.sendMessage(from, {
+                audio: audioBuffer,
+                mimetype: "audio/mpeg",
+                fileName: `${vid.title}.mp3`,
+                ptt: false
+            }, { quoted: mek })
 
-        const audioUrl = res?.data?.result?.download;
+            await conn.sendMessage(from, { react: { text: '✅', key: m.key } })
+            console.log(`✅ Song sent successfully!`)
 
-        if (!audioUrl) {
-            return reply("❌ API Error! Please try again later.");
+        } catch (e) {
+            console.log("❌ API Failed:", e.message)
+            await conn.sendMessage(from, { react: { text: '❌', key: m.key } })
+            return reply("❌ API Error! Please try again later.")
         }
 
-        // AUDIO MESSAGE (NEWSLETTER FORWARDED LOOK)
-        await conn.sendMessage(from, {
-            audio: { url: audioUrl },
-            mimetype: "audio/mpeg",
-            fileName: `${vid.title}.mp3`,
-            ptt: false,
-
-            contextInfo: {
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: "120363402493709861@newsletter",
-                    newsletterName: "NAWAZ MD MUSIC",
-                    serverMessageId: 1
-                },
-                externalAdReply: {
-                    title: vid.title,
-                    body: "🎶 Nawaz MD Music Player",
-                    thumbnailUrl: vid.thumbnail,
-                    sourceUrl: vid.url,
-                    mediaType: 1,
-                    renderLargerThumbnail: true,
-                    showAdAttribution: false
-                }
-            }
-
-        }, { quoted: mek });
-
-        await conn.sendMessage(from, {
-            react: {
-                text: '🎵',
-                key: m.key
-            }
-        });
-
     } catch (err) {
-        console.log("SONG ERROR:", err);
-        reply("❌ API Error! Please try again later.");
+        console.error("❌ SONG ERROR:", err)
+        await conn.sendMessage(from, { react: { text: '❌', key: m.key } })
+        reply("❌ API Error! Please try again later.")
     }
-});
+})
