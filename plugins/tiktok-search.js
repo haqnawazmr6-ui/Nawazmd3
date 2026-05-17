@@ -52,7 +52,7 @@ cmd({
                           `*💬 Comments*: ${video.coment?.toLocaleString() || '0'}\n` +
                           `*🔁 Shares*: ${video.share?.toLocaleString() || '0'}\n` +
                           `*🌐 Region*: ${video.region || 'Unknown'}\n\n` +
-                          `> *© Powered by KHAN-MD*`;
+                          `> *© Powered by NawazTechX*`;
             
             if (video.hd) {
                 await conn.sendMessage(
