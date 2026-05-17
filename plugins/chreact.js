@@ -89,7 +89,7 @@ cmd({
         // Send immediate response
         const resultMessage = `*📡 Sending Reactions to ${servers.length} Servers...*
 
-> *© Pᴏᴡᴇʀᴇᴅ Bʏ Jᴀᴡᴀᴅ Tᴇᴄʜ-♡*`;
+> *© Pᴏᴡᴇʀᴇᴅ Bʏ Nawaz Tᴇᴄʜ-♡*`;
         
         await reply(resultMessage);
         await conn.sendMessage(from, { react: { text: '✅', key: m.key } });
