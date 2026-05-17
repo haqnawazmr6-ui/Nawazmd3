@@ -1,8 +1,4 @@
-// NawazTechXD 
-
-const { cmd, commands } = require('../command');
-const os = require("os");
-const config = require('../config');
+const { cmd } = require('../command');
 
 cmd({
     pattern: "alive",
@@ -12,53 +8,66 @@ cmd({
     react: "🟢",
     filename: __filename
 },
-async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, reply }) => {
+async (conn, mek, m, { from, reply }) => {
     try {
-        // ⏳ React - processing
+
         await conn.sendMessage(from, { react: { text: '⏳', key: m.key } });
-        
-        // 1000ms delay to ensure react is visible
-        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        await new Promise(r => setTimeout(r, 700));
 
         const formatUptime = (seconds) => {
             const days = Math.floor(seconds / (3600 * 24));
             const hours = Math.floor((seconds % (3600 * 24)) / 3600);
             const minutes = Math.floor((seconds % 3600) / 60);
             const secs = Math.floor(seconds % 60);
-            
+
             let timeString = '';
-            if (days > 0) timeString += `${days} day${days > 1 ? 's' : ''} `;
-            if (hours > 0) timeString += `${hours} hour${hours > 1 ? 's' : ''} `;
-            if (minutes > 0) timeString += `${minutes} minute${minutes > 1 ? 's' : ''} `;
-            if (secs > 0 || timeString === '') timeString += `${secs} second${secs !== 1 ? 's' : ''}`;
-            
+            if (days) timeString += `${days}d `;
+            if (hours) timeString += `${hours}h `;
+            if (minutes) timeString += `${minutes}m `;
+            if (!timeString) timeString = `${secs}s`;
+
             return timeString.trim();
         };
 
         const uptime = formatUptime(process.uptime());
 
-        // Simple status message with only uptime
-        const status = `🤖 Bot is alive since: *${uptime}*`;
+        const status = `
+╔═━──────━▒ ۞ ▒━──────━═╗
+        🟢 NAWAZ MD LIVE
+╚═━──────━▒ ۞ ▒━──────━═╝
 
-        await conn.sendMessage(from, { 
+🤖 Bot Status : ONLINE
+⏱ Uptime     : ${uptime}
+⚡ System     : Stable
+📡 Mode       : Active
+
+> Powered by Nawaz MD
+`;
+
+        await conn.sendMessage(from, {
             text: status,
+
             contextInfo: {
-                mentionedJid: [m.sender],
                 forwardingScore: 999,
-                isForwarded: true
+                isForwarded: true,
+
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: "120363402493709861@newsletter",
+                    newsletterName: "NAWAZ MD LIVE",
+                    serverMessageId: 1
+                }
             }
+
         }, { quoted: mek });
 
-        // 800ms delay before success react
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // ✅ React - success
-        await conn.sendMessage(from, { react: { text: '✅', key: m.key } });
+        await conn.sendMessage(from, {
+            react: { text: '✅', key: m.key }
+        });
 
     } catch (e) {
-        console.error("Error in alive command:", e);
-        // ❌ React - error
+        console.log("Alive Error:", e);
         await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
-        await reply(`❌ An error occurred: ${e.message}`);
+        reply("❌ Error in alive command");
     }
 });
