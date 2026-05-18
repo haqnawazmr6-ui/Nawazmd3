@@ -1,7 +1,7 @@
 const { cmd } = require('../command');
 
 cmd({
-    pattern: "nawaz2",
+    pattern: "report",
     react: "🚨",
     category: "misc",
     filename: __filename
