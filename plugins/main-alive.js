@@ -2,9 +2,9 @@ const { cmd } = require('../command');
 
 cmd({
     pattern: "alive",
-    desc: "Bot speed check",
+    desc: "Premium alive with speed",
     category: "main",
-    react: "⚡",
+    react: "💎",
     filename: __filename
 },
 async (conn, mek, m, { from }) => {
@@ -17,9 +17,12 @@ async (conn, mek, m, { from }) => {
     const speed = end - start;
 
     const msg = `
-╭━━━〔 NAWAZ MD 〕━━━╮
-┃  ${speed} ms
-╰━━━━━━━━━━━━━━━╯
+╔══════════════════╗
+      💎 NAWAZ MD
+╚══════════════════╝
+
+⚡ SPEED : ${speed} ms
+💠 STATUS : ONLINE
 `;
 
     await conn.sendMessage(from, {
