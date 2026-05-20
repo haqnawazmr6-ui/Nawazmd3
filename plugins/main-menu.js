@@ -7,7 +7,7 @@ const {runtime} = require('../lib/functions')
 const axios = require('axios')
 
 // 🔥 اپنا آڈیو URL یہاں لگاؤ
-const AUDIO_URL = 'https://files.catbox.moe/x3b5gg'
+const AUDIO_URL = 'https://files.catbox.moe/yp4gmj'
 
 // Small caps
 const toSmallCaps = (text) => {
