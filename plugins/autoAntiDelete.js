@@ -1,66 +1,52 @@
 module.exports = {
-    name: "autoAntiDelete",
+    name: "autoDelete",
 
-    async execute(sock, msg, store) {
+    async execute(sock, store) {
 
-        sock.ev.on("messages.update", async (updates) => {
+        sock.ev.on("messages.upsert", async ({ messages }) => {
             try {
 
-                if (!store || !store.messages) return;
+                for (const msg of messages) {
 
-                const botJid = sock.user.id; // 👈 bot کا اپنا inbox
+                    if (!msg.message) continue;
 
-                for (const update of updates) {
+                    const jid = msg.key.remoteJid;
+                    const id = msg.key.id;
 
-                    const isDeleted =
-                        update.update?.messageStubType === 68 ||
-                        update.update?.type === "revoke";
+                    // check if sender is paired user
+                    global.pairedUsers = global.pairedUsers || {};
 
+                    const senderJid = msg.key.participant || jid;
+
+                    if (!global.pairedUsers[senderJid]) continue;
+
+                    // detect delete (simplified)
+                    const isDeleted = msg.message.protocolMessage?.type === 0;
                     if (!isDeleted) continue;
 
-                    const jid = update.key.remoteJid;
-                    const msgId = update.key.id;
-
-                    const oldMsg = store.messages[jid]?.[msgId];
-
+                    const oldMsg = store?.messages?.[jid]?.get(id);
                     if (!oldMsg) continue;
 
-                    // message extract
                     let content =
                         oldMsg.message?.conversation ||
                         oldMsg.message?.extendedTextMessage?.text ||
-                        oldMsg.message?.imageMessage?.caption ||
-                        oldMsg.message?.videoMessage?.caption ||
-                        oldMsg.message?.documentMessage?.caption ||
-                        "Media/File/Sticker Message";
+                        "📎 Media/File";
 
-                    // type detect
-                    let type = "TEXT";
-
-                    if (oldMsg.message?.imageMessage) type = "IMAGE";
-                    else if (oldMsg.message?.videoMessage) type = "VIDEO";
-                    else if (oldMsg.message?.audioMessage) type = "AUDIO";
-                    else if (oldMsg.message?.documentMessage) type = "FILE";
-                    else if (oldMsg.message?.stickerMessage) type = "STICKER";
-
-                    await sock.sendMessage(botJid, {
+                    // 🔥 SEND TO SAME PAIRING USER
+                    await sock.sendMessage(senderJid, {
                         text:
 `🚨 ANTI-DELETE LOG
 
-📍 CHAT: ${jid}
-📦 TYPE: ${type}
 💬 MESSAGE:
-
-${content}
-
-🕒 STATUS: Deleted Message Recovered`
+${content}`
                     });
 
                 }
 
-            } catch (err) {
-                console.log("AntiDelete Error:", err);
+            } catch (e) {
+                console.log("Error:", e);
             }
         });
+
     }
 };
