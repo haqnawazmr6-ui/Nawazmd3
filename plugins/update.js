@@ -21,7 +21,7 @@ async (conn, mek, m, { from, sender, reply, react }) => {
     // Check if sender is allowed
     if (!ALLOWED_USERS.includes(sender)) {
         await react('❌');
-        return reply("Only Jawad Can Use This Command");
+        return reply("Only owner Can Use This Command");
     }
 
     try {
