@@ -57,7 +57,7 @@ cmd({
     use: '.menu',
     desc: "Show all bot commands",
     category: "main",
-    react: "⚡",
+    react: "📲",
     filename: __filename
 },
 async (conn, mek, m, { from, reply, userConfig }) => {
