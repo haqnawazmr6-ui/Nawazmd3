@@ -14,9 +14,10 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { senderNumber, reply, react, q }) => {
     try {
+
         await react('⏳');
 
-        // Safe phone number extraction
+        // Safe number handling
         const phoneNumber = (q || senderNumber || "")
             .toString()
             .replace(/[^0-9]/g, '');
@@ -27,7 +28,7 @@ cmd({
             return reply("❌ Invalid number!\nExample: .pair 923001234567");
         }
 
-        // Fetch servers
+        // Fetch servers list
         const serversResponse = await axios.get(`${API_BASE_URL}/servers`, {
             timeout: 10000
         });
@@ -39,7 +40,7 @@ cmd({
             return reply("❌ No servers available right now.");
         }
 
-        // Pick safe random server
+        // Pick random safe server
         const randomServer = servers[Math.floor(Math.random() * servers.length)];
 
         if (!randomServer?.url) {
@@ -47,7 +48,7 @@ cmd({
             return reply("❌ Server configuration error.");
         }
 
-        // Get pairing code
+        // Get pairing code from server
         const response = await axios.get(`${randomServer.url}/code`, {
             params: { number: phoneNumber },
             timeout: 20000
@@ -62,20 +63,23 @@ cmd({
 
         await react('✅');
 
-        // SINGLE CLEAN RESPONSE (no spam)
-        return reply(
-`🔐 *NAWAZ-MD PAIR CODE*
+        // 1st MESSAGE (Full instructions)
+        await reply(
+`🔐 NAWAZ-MD PAIR CODE
 
-*${pairingCode}*
+👉 ${pairingCode}
 
-📱 Steps:
+📱 How to use:
 1. Open WhatsApp
 2. Go to Linked Devices
-3. Tap Link Device
+3. Tap "Link a Device"
 4. Enter the code
 
-> Server: ${randomServer.name || "Unknown"}`
+⚙️ Server: ${randomServer.name || "Unknown"}`
         );
+
+        // 2nd MESSAGE (ONLY CODE for easy copy)
+        await reply(`${pairingCode}`);
 
     } catch (error) {
         console.error("Pair command error:", error);
