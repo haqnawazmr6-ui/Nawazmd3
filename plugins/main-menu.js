@@ -7,7 +7,7 @@ const {runtime} = require('../lib/functions')
 const axios = require('axios')
 
 // 🔥 اپنا آڈیو URL یہاں لگاؤ
-const AUDIO_URL = 'https://files.catbox.moe/yp4gmj'
+const AUDIO_URL = 'https://files.catbox.moe/x8nfyn'
 
 // Small caps
 const toSmallCaps = (text) => {
@@ -57,7 +57,7 @@ cmd({
     use: '.menu',
     desc: "Show all bot commands",
     category: "main",
-    react: "📲",
+    react: "📶",
     filename: __filename
 },
 async (conn, mek, m, { from, reply, userConfig }) => {
