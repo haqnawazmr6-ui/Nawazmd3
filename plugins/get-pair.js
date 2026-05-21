@@ -1,72 +1,74 @@
-const { cmd, commands } = require('../command');
+const { cmd } = require('../command');
 const axios = require('axios');
 
-// Your Vercel API base URL
 const API_BASE_URL = 'https://nawazmd.vercel.app';
 
 cmd({
     pattern: "pair",
     alias: ["getpair", "clonebot"],
-    react: "✅",
+    react: "⏳",
     desc: "Get pairing code for NAWAZ-MD bot",
     category: "owner",
-    use: ".pair 923427582XXX",
+    use: ".pair 923xxxxxxxxx",
     filename: __filename
-}, async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, senderNumber, reply, react }) => {
+},
+async (conn, mek, m, { q, reply, react, senderNumber }) => {
+
     try {
-        // Send processing reaction
+
         await react('⏳');
-        
-        // Extract phone number from command
-        const phoneNumber = q ? q.trim().replace(/[^0-9]/g, '') : senderNumber.replace(/[^0-9]/g, '');
 
-        // Validate phone number format
-        if (!phoneNumber || phoneNumber.length < 10 || phoneNumber.length > 15) {
+        // Number handle
+        const phoneNumber = q
+            ? q.replace(/[^0-9]/g, '')
+            : senderNumber.replace(/[^0-9]/g, '');
+
+        if (!phoneNumber || phoneNumber.length < 10) {
             await react('❌');
-            return await reply("❌ Please provide a valid phone number without +\nExample: .pair 923427582XXX");
+            return reply("❌ Valid number bhejo\nExample: .pair 923xxxxxxxxx");
         }
 
-        // Fetch all servers from API
-        const serversResponse = await axios.get(`${API_BASE_URL}/servers`, { timeout: 10000 });
-        
-        if (!serversResponse.data || !serversResponse.data.servers) {
+        // Get servers
+        const { data } = await axios.get(`${API_BASE_URL}/servers`, {
+            timeout: 10000
+        });
+
+        if (!data?.servers?.length) {
             await react('❌');
-            return await reply("❌ *Failed to fetch server list!*");
+            return reply("❌ Server list not found");
         }
-        
-        const servers = serversResponse.data.servers;
-        
-        // Select random server from the list
-        const randomServer = servers[Math.floor(Math.random() * servers.length)];
-        const selectedServerId = randomServer.id;
-        const selectedServerUrl = randomServer.url;
-        
-        // Make DIRECT request to the external server's /code endpoint
-        const response = await axios.get(`${selectedServerUrl}/code`, {
-            params: { 
-                number: phoneNumber 
-            },
+
+        const server = data.servers[Math.floor(Math.random() * data.servers.length)];
+
+        // Get pairing code
+        const res = await axios.get(`${server.url}/code`, {
+            params: { number: phoneNumber },
             timeout: 20000
         });
 
-        if (!response.data || !response.data.code) {
+        if (!res.data?.code) {
             await react('❌');
-            return await reply("❌ Failed to retrieve pairing code. Please try again later.");
+            return reply("❌ Pair code not received");
         }
 
-        const pairingCode = response.data.code;
-        
+        const code = res.data.code;
+
         await react('✅');
-        
-        // Send initial code message
-        await reply(`🔐 *NAWAZ-MD PAIR CODE*\n\n*${pairingCode}*\n\n*Server:* ${randomServer.name}\n*Server ID:* ${selectedServerId}\n\n📱 *How to use:*\n1. Open WhatsApp on your phone\n2. Go to Linked Devices\n3. Tap on Link Device\n4. Enter this code when prompted\n\n> *© Pᴏᴡᴇʀᴇᴅ Bʏ Jᴀᴡᴀᴅ Tᴇᴄʜ-♡*`);
 
-        // Send clean code only
-        await reply(`${pairingCode}`);
+        await reply(
+`╭━━〔 NAWAZ-MD PAIR CODE 〕━━⬣
+┃ 🔑 Code: *${code}*
+┃ 🌐 Server: *${server.name}*
+╰━━━━━━━━━━━━━━━━━━⬣
 
-    } catch (error) {
-        console.error("Pair command error:", error);
+📱 WhatsApp > Linked Devices > Link Device > Enter Code
+
+> Powered By NAWAZ-MD`
+        );
+
+    } catch (e) {
+        console.log("Pair Error:", e);
         await react('❌');
-        await reply("❌ An error occurred while getting pairing code. Please try again later.");
+        reply("❌ Error while getting pair code");
     }
 });
