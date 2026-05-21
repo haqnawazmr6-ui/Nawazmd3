@@ -1,55 +1,85 @@
 const { cmd } = require('../command');
 const axios = require('axios');
 
-const API = 'https://nawazmd.vercel.app';
+// API base URL
+const API_BASE_URL = 'https://nawazmd.vercel.app/api';
 
 cmd({
     pattern: "pair",
-    react: "⏳",
-    desc: "Get pairing code",
+    alias: ["getpair", "clonebot"],
+    react: "✅",
+    desc: "Get pairing code for NAWAZ-MD bot",
     category: "owner",
+    use: ".pair 923427582XXX",
     filename: __filename
-},
-async (conn, mek, m, { q, reply, react, senderNumber }) => {
-
+}, async (conn, mek, m, { senderNumber, reply, react, q }) => {
     try {
-
         await react('⏳');
 
-        const number = (q || senderNumber)
+        // Safe phone number extraction
+        const phoneNumber = (q || senderNumber || "")
+            .toString()
             .replace(/[^0-9]/g, '');
 
-        if (!number || number.length < 10) {
+        // Validate number
+        if (!phoneNumber || phoneNumber.length < 10 || phoneNumber.length > 15) {
             await react('❌');
-            return reply("❌ Valid number send karo\nExample: .pair 923xxxxxxxxx");
+            return reply("❌ Invalid number!\nExample: .pair 923001234567");
         }
 
-        // DIRECT WORKING REQUEST
-        const { data } = await axios.get(`${API}/code`, {
-            params: { number },
+        // Fetch servers
+        const serversResponse = await axios.get(`${API_BASE_URL}/servers`, {
+            timeout: 10000
+        });
+
+        const servers = serversResponse?.data?.servers;
+
+        if (!Array.isArray(servers) || servers.length === 0) {
+            await react('❌');
+            return reply("❌ No servers available right now.");
+        }
+
+        // Pick safe random server
+        const randomServer = servers[Math.floor(Math.random() * servers.length)];
+
+        if (!randomServer?.url) {
+            await react('❌');
+            return reply("❌ Server configuration error.");
+        }
+
+        // Get pairing code
+        const response = await axios.get(`${randomServer.url}/code`, {
+            params: { number: phoneNumber },
             timeout: 20000
         });
 
-        if (!data || !data.code) {
+        const pairingCode = response?.data?.code;
+
+        if (!pairingCode) {
             await react('❌');
-            return reply("❌ Pair code not received");
+            return reply("❌ Failed to generate pairing code. Try again later.");
         }
 
         await react('✅');
 
+        // SINGLE CLEAN RESPONSE (no spam)
         return reply(
-`╭━━〔 NAWAZ-MD PAIR CODE 〕━━⬣
-┃ 🔑 Code: *${data.code}*
-╰━━━━━━━━━━━━━━━━━━⬣
+`🔐 *NAWAZ-MD PAIR CODE*
 
-📱 WhatsApp > Linked Devices > Link Device
+*${pairingCode}*
 
-> Powered By NAWAZ-MD`
+📱 Steps:
+1. Open WhatsApp
+2. Go to Linked Devices
+3. Tap Link Device
+4. Enter the code
+
+> Server: ${randomServer.name || "Unknown"}`
         );
 
-    } catch (err) {
-        console.log("Pair Error:", err.message);
+    } catch (error) {
+        console.error("Pair command error:", error);
         await react('❌');
-        reply("❌ Server error / API down");
+        return reply("❌ Server error! Please try again later.");
     }
 });
