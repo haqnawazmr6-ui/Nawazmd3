@@ -2,7 +2,7 @@ const { cmd } = require('../command');
 
 cmd({
     pattern: "sc",
-    desc: "Show owner & server tabs",
+    desc: "Show bot info",
     category: "main",
     react: "⚙️",
     filename: __filename
@@ -15,23 +15,16 @@ async (conn, mek, m, { from }) => {
     const message = `
 🤖 NAWAZ-MD INFO
 
-Choose a tab:
+👤 OWNER:
+${ownerNumber}
+
+🌐 SERVER:
+${serverLink}
+
+━━━━━━━━━━━━━━
+⚡ Power by Nawaz MD
 `;
 
-    await conn.sendMessage(from, {
-        text: message,
-        buttons: [
-            {
-                buttonId: `tab1_owner_${ownerNumber}`,
-                buttonText: { displayText: "📌 TAB ONE" },
-                type: 1
-            },
-            {
-                buttonId: `tab2_server_${serverLink}`,
-                buttonText: { displayText: "📌 TAB TWO" },
-                type: 1
-            }
-        ],
-        headerType: 1
-    }, { quoted: mek });
+    await conn.sendMessage(from, { text: message }, { quoted: mek });
+
 });
