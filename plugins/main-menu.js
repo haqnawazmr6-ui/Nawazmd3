@@ -6,10 +6,7 @@ const fs = require('fs');
 const {runtime} = require('../lib/functions')
 const axios = require('axios')
 
-// 🔥 اپنا آڈیو URL یہاں لگاؤ
-const AUDIO_URL = 'https://files.catbox.moe/x8nfyn'
-
-// Small caps
+// 🔥 Small caps
 const toSmallCaps = (text) => {
     if (!text || typeof text !== 'string') return '';
     const smallCapsMap = {
@@ -57,7 +54,7 @@ cmd({
     use: '.menu',
     desc: "Show all bot commands",
     category: "main",
-    react: "⬇️",
+    react: "🎭",
     filename: __filename
 },
 async (conn, mek, m, { from, reply, userConfig }) => {
@@ -123,7 +120,7 @@ ${menuSections}
             } catch {}
         }
 
-        // 📱 پہلے Menu Send ہوگا
+        // 📱 Menu Send (ONLY IMAGE)
         await conn.sendMessage(from, {
             image: { url: imageToUse },
             caption: dec,
@@ -136,13 +133,6 @@ ${menuSections}
                     serverMessageId: Date.now()
                 }
             }
-        }, { quoted: mek });
-
-        // 🔥 پھر Audio Send ہوگی
-        await conn.sendMessage(from, {
-            audio: { url: AUDIO_URL },
-            mimetype: 'audio/mp4',
-            ptt: false 
         }, { quoted: mek });
 
     } catch (e) {
