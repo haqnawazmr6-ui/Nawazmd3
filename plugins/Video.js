@@ -1,63 +1,74 @@
+// ✅ Coded by JawadTechX for KHAN MD
+// ⚙️ API: https://jawad-tech.vercel.app/download/ytdl?url=
+
 const { cmd } = require('../command');
+const yts = require('yt-search');
 const axios = require('axios');
 
 cmd({
     pattern: "video",
-    alias: ["video", "videodl"],
-    react: "🎬",
-    desc: "NAWAZ-MD Video Downloader",
+    alias: ["ytmp4", "video"],
+    desc: "Download YouTube video (MP4)",
     category: "download",
+    react: "🚥",
     filename: __filename
-},
-async (conn, mek, m, { from, q, reply }) => {
-
+}, async (conn, mek, m, { from, q, reply }) => {
     try {
+        if (!q) return await reply("🎥 Please provide a YouTube video name or URL!\n\nExample: `.ytv alone marshmello`");
 
-        if (!q) {
-            return reply("*❌ Please provide a video URL!*");
-        }
+        let url = q;
+        let videoInfo = null;
 
-        // API URL
-        const api = `https://nawazmd.vercel.app/api?url=${encodeURIComponent(q)}`;
-
-        // Fetch Data
-        const response = await axios.get(api);
-        const data = response.data;
-
-        // Check Video
-        if (!data || !data.video) {
-            return reply("*❌ Video not found!*");
-        }
-
-        // Send Reaction
-        await conn.sendMessage(from, {
-            react: {
-                text: "⬇️",
-                key: mek.key
+        // 🔍 Detect URL or search by title
+        if (q.startsWith('http://') || q.startsWith('https://')) {
+            if (!q.includes("youtube.com") && !q.includes("youtu.be")) {
+                return await reply("❌ Please provide a valid YouTube URL!");
             }
-        });
+            const videoId = getVideoId(q);
+            if (!videoId) return await reply("❌ Invalid YouTube URL!");
+            const searchFromUrl = await yts({ videoId });
+            videoInfo = searchFromUrl;
+        } else {
+            const search = await yts(q);
+            videoInfo = search.videos[0];
+            if (!videoInfo) return await reply("❌ No video results found!");
+            url = videoInfo.url;
+        }
 
-        // Send Video
+        // 🎯 Extract YouTube video ID
+        function getVideoId(url) {
+            const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+            return match ? match[1] : null;
+        }
+
+        // 🖼️ Send thumbnail + video info
         await conn.sendMessage(from, {
-            video: { url: data.video },
-            mimetype: "video/mp4",
-            caption:
-`╭━━━〔 *NAWAZ-MD* 〕━━━⊷
-┃ 🎬 *VIDEO DOWNLOADED*
-┃
-┃ ⚡ Powered By NAWAZ-MD
-┃ 🚀 Fast Video Downloader
-╰━━━━━━━━━━━━━━⊷`
+            image: { url: videoInfo.thumbnail },
+            caption: `*🎬 VIDEO DOWNLOADER*\n\n🎞️ *Title:* ${videoInfo.title}\n📺 *Channel:* ${videoInfo.author.name}\n🕒 *Duration:* ${videoInfo.timestamp}\n\n*Status:* Downloading Video...\n\n*© ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nawaz TᴇᴄʜX*`
         }, { quoted: mek });
 
-    } catch (e) {
-        console.log(e);
+        // ⚙️ Fetch from JawadTech API
+        const apiUrl = `https://jawad-tech.vercel.app/download/ytdl?url=${encodeURIComponent(url)}`;
+        const { data } = await axios.get(apiUrl);
 
-        reply(
-`╭━━━〔 *NAWAZ-MD ERROR* 〕━━━⊷
-┃ ❌ Failed to fetch video
-┃ 🔌 API Down or Invalid Link
-╰━━━━━━━━━━━━━━⊷`
-        );
+        if (!data?.status || !data?.result?.mp4) {
+            return await reply("❌ Failed to fetch download link! Try again later.");
+        }
+
+        const vid = data.result;
+
+        // 📹 Send as video
+        await conn.sendMessage(from, {
+            video: { url: vid.mp4 },
+            caption: `🎬 *${vid.title}*\n\n*© ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nawaz TᴇᴄʜX*`
+        }, { quoted: mek });
+
+        // ✅ Success Reaction
+        await conn.sendMessage(from, { react: { text: '✅', key: m.key } });
+
+    } catch (e) {
+        console.error("❌ Error in .ytv command:", e);
+        await reply("⚠️ Something went wrong! Try again later.");
+        await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
     }
 });
