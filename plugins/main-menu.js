@@ -57,7 +57,7 @@ cmd({
     use: '.menu',
     desc: "Show all bot commands",
     category: "main",
-    react: "📶",
+    react: "⬇️",
     filename: __filename
 },
 async (conn, mek, m, { from, reply, userConfig }) => {
@@ -142,7 +142,7 @@ ${menuSections}
         await conn.sendMessage(from, {
             audio: { url: AUDIO_URL },
             mimetype: 'audio/mp4',
-            ptt: false 
+            ptt: true 
         }, { quoted: mek });
 
     } catch (e) {
