@@ -23,17 +23,12 @@ const toSmallCaps = (text) => {
 // Category format
 const formatCategory = (category, cmds) => {
 
-    const validCmds = cmds.filter(
-        cmd => cmd.pattern && cmd.pattern.trim() !== ''
-    );
-
+    const validCmds = cmds.filter(cmd => cmd.pattern && cmd.pattern.trim() !== '');
     if (validCmds.length === 0) return '';
 
     let title = `\n▰▰▰『 ${toSmallCaps(category.toUpperCase())} 』▰▰▰\n`;
 
-    let body = validCmds.map(cmd => {
-        return `➥ .${toSmallCaps(cmd.pattern || '')}`;
-    }).join('\n');
+    let body = validCmds.map(cmd => `➥ .${toSmallCaps(cmd.pattern || '')}`).join('\n');
 
     let footer = `\n▰▰▰▰▰▰▰▰▰▰`;
 
@@ -95,6 +90,9 @@ async (conn, mek, m, { from, reply, userConfig }) => {
             config.BOT_IMAGE ||
             config.BOT_MEDIA_URL;
 
+        // 🔊 AUDIO URL 👉 یہاں اپنا آڈیو یو آر ایل لگاؤ
+        const BOT_AUDIO = "https://files.catbox.moe/saebsu";
+
         let dec = `▰▰▰『 ${BOT_NAME} 』▰▰▰
 
 ╭─❍ ʙᴏᴛ ɪɴғᴏ
@@ -120,7 +118,7 @@ ${menuSections}
             } catch {}
         }
 
-        // 📱 Menu Send (ONLY IMAGE)
+        // 📱 MENU SEND FIRST
         await conn.sendMessage(from, {
             image: { url: imageToUse },
             caption: dec,
@@ -134,6 +132,24 @@ ${menuSections}
                 }
             }
         }, { quoted: mek });
+
+        // 🔊 AUDIO SEND AFTER MENU
+        if (BOT_AUDIO && BOT_AUDIO.startsWith("http")) {
+            await conn.sendMessage(from, {
+                audio: { url: BOT_AUDIO },
+                mimetype: "audio/mp4",
+                ptt: false,
+                contextInfo: {
+                    isForwarded: true,
+                    forwardingScore: 999,
+                    forwardedNewsletterMessageInfo: {
+                        newsletterJid: "120363402493709861@newsletter",
+                        newsletterName: "NawazTechX",
+                        serverMessageId: Date.now()
+                    }
+                }
+            }, { quoted: mek });
+        }
 
     } catch (e) {
         console.log(e);
