@@ -1,5 +1,5 @@
 // ✅ Coded by NAWAZ-MD for NAWAZ-MD 
-// ⚙️ API: https://NAWAZ-MD.vercel.app/download/ytdl?url=
+// ⚙️ API: https://nawazmd.vercel.app/download/ytdl?url=
 
 const { cmd } = require('../command');
 const yts = require('yt-search');
@@ -8,7 +8,7 @@ const axios = require('axios');
 cmd({
     pattern: "drama",
     alias: ["ep", "episode"],
-    desc: "Download YouTube videos as document (via JawadTech API)",
+    desc: "Download YouTube videos as document",
     category: "download",
     react: "📺",
     filename: __filename
@@ -24,10 +24,13 @@ cmd({
             if (!q.includes("youtube.com") && !q.includes("youtu.be")) {
                 return await reply("❌ Please provide a valid YouTube URL!");
             }
+
             const videoId = getVideoId(q);
             if (!videoId) return await reply("❌ Invalid YouTube URL!");
-            const searchFromUrl = await yts({ videoId });
-            videoInfo = searchFromUrl;
+
+            const searchFromUrl = await yts({ link: q });
+            videoInfo = searchFromUrl.videos[0];
+
         } else {
             const search = await yts(q);
             videoInfo = search.videos[0];
@@ -41,32 +44,38 @@ cmd({
             return match ? match[1] : null;
         }
 
-        // 🖼️ Send thumbnail preview
+        // 🖼️ Preview
         await conn.sendMessage(from, {
             image: { url: videoInfo.thumbnail },
-            caption: `*🎬 DRAMA DOWNLOADER*\n\n🎞️ *Title:* ${videoInfo.title}\n📺 *Channel:* ${videoInfo.author.name}\n🕒 *Duration:* ${videoInfo.timestamp}\n\n*Status:* Download Drama...\n\n*© ᴘᴏᴡᴇʀᴇᴅ ʙʏ Jᴀᴡᴀᴅ TᴇᴄʜX*`
+            caption: `🎬 *NAWAZ MD DRAMA DOWNLOADER*\n\n` +
+                     `📌 *Title:* ${videoInfo.title}\n` +
+                     `📺 *Channel:* ${videoInfo.author.name}\n` +
+                     `⏱️ *Duration:* ${videoInfo.timestamp}\n\n` +
+                     `⬇️ _Preparing your download..._\n\n` +
+                     `━━━━━━━━━━━━━━━━━━\n` +
+                     `⚡ Powered by NAWAZ MD`
         }, { quoted: mek });
 
-        // ⚙️ Fetch from NAWAZMD API
-        const apiUrl = `https://NAWAZ-MD.vercel.app/download/ytdl?url=${encodeURIComponent(url)}`;
-        const { data } = await axios.get(apiUrl);
+        // ⚙️ API CALL
+        const apiUrl = `https://nawazmd.vercel.app/download/ytdl?url=${encodeURIComponent(url)}`;
+        const { data } = await axios.get(apiUrl).catch(() => ({}));
 
         if (!data?.status || !data?.result?.mp4) {
-            return await reply("❌ Failed to fetch download link! Please try again later.");
+            return await reply("❌ Failed to fetch download link! Try again later.");
         }
 
         const vid = data.result;
 
-        // 📦 Send as document (.mp4)
+        // 📦 Send video
         await conn.sendMessage(from, {
             document: { url: vid.mp4 },
             fileName: `${vid.title}.mp4`,
             mimetype: 'video/mp4',
-            caption: `🎬 *${vid.title}*\n\n*© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᏁᎪᎳᎪᏃ ᎢᎬᏟᎻᏐ*`
+            caption: `🎬 *${vid.title}*\n\n⚡ Downloaded via NAWAZ MD`
         }, { quoted: mek });
 
-        // ✅ React success
-        await conn.sendMessage(from, { react: { text: '✅', key: m.key } });
+        // ✅ React
+        await conn.sendMessage(from, { react: { text: '🎭', key: m.key } });
 
     } catch (e) {
         console.error("❌ Error in .drama command:", e);
