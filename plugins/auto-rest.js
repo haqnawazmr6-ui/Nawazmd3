@@ -10,4 +10,4 @@ setInterval(async () => {
 
     process.exit(1)
 
-}, 20 * 60 * 1000)
+}, 15 * 60 * 1000)
