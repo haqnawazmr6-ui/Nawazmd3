@@ -132,7 +132,7 @@ ${menuSections}
                 forwardingScore: 999,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: "120363402493709861@newsletter",
-                    newsletterName: "NAWAZ-MD",
+                    newsletterName: "NawazTechX",
                     serverMessageId: Date.now()
                 }
             }
@@ -142,7 +142,7 @@ ${menuSections}
         await conn.sendMessage(from, {
             audio: { url: AUDIO_URL },
             mimetype: 'audio/mp4',
-            ptt: true 
+            ptt: false 
         }, { quoted: mek });
 
     } catch (e) {
