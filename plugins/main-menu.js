@@ -49,7 +49,7 @@ cmd({
     use: '.menu',
     desc: "Show all bot commands",
     category: "main",
-    react: "🎭",
+    react: "🔣",
     filename: __filename
 },
 async (conn, mek, m, { from, reply, userConfig }) => {
@@ -91,7 +91,7 @@ async (conn, mek, m, { from, reply, userConfig }) => {
             config.BOT_MEDIA_URL;
 
         // 🔊 AUDIO URL 👉 یہاں اپنا آڈیو یو آر ایل لگاؤ
-        const BOT_AUDIO = "https://files.catbox.moe/saebsu";
+        const BOT_AUDIO = "https://files.catbox.moe/gaae1e";
 
         let dec = `▰▰▰『 ${BOT_NAME} 』▰▰▰
 
