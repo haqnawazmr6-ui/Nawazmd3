@@ -1,52 +1,54 @@
-// ✅ Coded by NawazTechX
-// 🔍 Command: playstore / ps / appsearch
-// 📁 Category: utility
-
-const { cmd } = require('../command');
-const axios = require('axios');
-const config = require('../config');
+const { cmd } = require("../command")
+const gplay = require("google-play-scraper")
 
 cmd({
-  pattern: "playstore",
-  alias: ["ps", "appsearch"],
-  desc: "Search any Android app from Play Store.",
-  category: "utility",
-  react: "📱",
-  use: ".playstore <app name>",
-  filename: __filename
-}, async (conn, mek, m, { from, args, reply }) => {
-  try {
-    if (!args[0]) return reply("📍 Please provide an app name.\n\nExample: *.playstore Free Fire*");
+    pattern: "app",
+    alias: ["playstore", "apksearch"],
+    desc: "Search apps from Play Store",
+    category: "search",
+    filename: __filename
+},
+async (conn, mek, m, { from, args, reply }) => {
 
-    const query = args.join(" ");
-    const apiUrl = `https://api.hanggts.xyz/search/playstore?q=${encodeURIComponent(query)}`;
-    
-    const { data } = await axios.get(apiUrl);
-    if (!data.status || !data.result || data.result.length === 0) {
-      return reply("❌ No results found for your query.");
+    try {
+
+        if (!args[0]) {
+            return reply("❌ App name likho\nExample: .app whatsapp")
+        }
+
+        let query = args.join(" ")
+
+        let result = await gplay.search({
+            term: query,
+            num: 1
+        })
+
+        if (!result || result.length === 0) {
+            return reply("❌ Koi app nahi mili")
+        }
+
+        let app = result[0]
+
+        let msg = `
+╭━━━〔 📱 PLAY STORE APP 〕━━━⬣
+┃
+┃ 📌 Name: ${app.title}
+┃ 👨‍💻 Developer: ${app.developer}
+┃ ⭐ Rating: ${app.score || "N/A"}
+┃
+┃ 🔗 Link:
+┃ https://play.google.com/store/apps/details?id=${app.appId}
+┃
+╰━━━━━━━━━━━━━━⬣
+
+⚡ Power By Nawaz Ahmedi 🤖
+`
+
+        reply(msg)
+
+    } catch (e) {
+        console.log(e)
+        reply("❌ Error aa gaya")
     }
 
-    const app = data.result[0]; // Show only the first result
-
-    const caption = `
-📱 *PLAY STORE APP FOUND!*
-
-🏷️ *Name:* ${app.nama}
-👨‍💻 *Developer:* ${app.developer}
-⭐ *Rating:* ${app.rate2}
-🌐 *App Link:* ${app.link}
-🧑‍💻 *Dev Page:* ${app.link_dev}
-
-🔋 *Powered By NawazTechX 🇵🇰*
-    `.trim();
-
-    await conn.sendMessage(from, {
-      image: { url: app.img },
-      caption
-    }, { quoted: mek });
-
-  } catch (err) {
-    console.error("PLAYSTORE SEARCH ERROR:", err);
-    reply("⚠️ Error fetching Play Store results. Please try again later.");
-  }
-});
+})
