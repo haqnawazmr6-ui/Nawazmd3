@@ -31,7 +31,7 @@ serverMessageId: 143
 
 // 🎵 Audio Send After Image
 await conn.sendMessage(from, {
-audio: { url: "https://files.catbox.moe/u4wbuq" },
+audio: { url: "https://files.catbox.moe/gaae1e" },
 mimetype: "audio/mp4",
 ptt: false 
 }, { quoted: mek })
