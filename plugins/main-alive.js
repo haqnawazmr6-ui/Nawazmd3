@@ -12,7 +12,7 @@ cmd({
 async (conn, mek, m, { from }) => {
 
 await conn.sendMessage(from, {
-image: { url: "https://files.catbox.moe/rehpq1.png" },
+image: { url: "https://files.catbox.moe/25xgu7.png" },
 
 caption: `> POWERED BY NAWAZ-MD ☠️`,
 
