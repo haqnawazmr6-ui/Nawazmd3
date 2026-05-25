@@ -91,7 +91,7 @@ async (conn, mek, m, { from, reply, userConfig }) => {
             config.BOT_MEDIA_URL;
 
         // 🔊 AUDIO URL 👉 یہاں اپنا آڈیو یو آر ایل لگاؤ
-        const BOT_AUDIO = "https://files.catbox.moe/gaae1e";
+        const BOT_AUDIO = "https://files.catbox.moe/nhhpue";
 
         let dec = `▰▰▰『 ${BOT_NAME} 』▰▰▰
 
