@@ -1,39 +1,28 @@
-const config = require('../config')
-const { cmd } = require('../command')
-
 cmd({
-    pattern: "alive",
-    react: "⚡",
-    alias: ["online"],
-    desc: "Alive Check",
-    category: "main",
-    filename: __filename
+  pattern: "alive",
+  desc: "Alive with image",
+  category: "main",
+  react: "💖"
 },
-async (conn, mek, m, { from }) => {
+async (conn, mek, m, { reply }) => {
 
-await conn.sendMessage(from, {
-image: { url: "https://files.catbox.moe/25xgu7.png" },
+const start = Date.now();
 
-caption: `> POWERED BY NAWAZ-MD ☠️`,
+const msg = `💖 ━━━〔 N❤️S 〕━━━ 💖
 
-contextInfo: {
-forwardingScore: 999,
-isForwarded: true,
+🤖 𝙉𝘼𝙒𝘼𝙕-𝙈𝘿
+💫 𝙎𝙮𝙨𝙩𝙚𝙢 𝙊𝙣𝙡𝙞𝙣𝙚
 
-forwardedNewsletterMessageInfo: {
-newsletterJid: "120363402493709861@newsletter",
-newsletterName: "NAWAZ-MD",
-serverMessageId: 143
-}
-}
+⏱️ 𝙋𝙞𝙣𝙜 : ${Date.now() - start} ms
 
-}, { quoted: mek })
+💖 ━━━━━━━━━━━━━ 💖`;
 
-// 🎵 Audio Send After Image
-await conn.sendMessage(from, {
-audio: { url: "https://files.catbox.moe/nhhpue" },
-mimetype: "audio/mp4",
-ptt: false 
-}, { quoted: mek })
+// 👇 image URL (yahan apni DP link lagao)
+const image = "https://files.catbox.moe/1zx1hy.jpeg";
 
-})
+await conn.sendMessage(m.chat, {
+  image: { url: image },
+  caption: msg
+}, { quoted: mek });
+
+});
