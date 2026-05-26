@@ -1,22 +1,33 @@
 cmd({
-  pattern: "alive",
-  desc: "Check bot status",
-  category: "main",
-  react: "💖"
+    pattern: "alive",
+    alias: ["ping", "status"],
+    desc: "Check if bot is alive",
+    category: "utility",
+    react: "💚",
+    filename: __filename
 },
-async (conn, mek, m, { reply }) => {
+async (conn, mek, m, { from, reply }) => {
+    try {
+        await conn.sendMessage(from, { react: { text: '💚', key: m.key } });
+        
+        const uptime = runtime(process.uptime());
+        
+        const aliveMsg = `🤖 *Bot Is Alive Since ${uptime}*`;
+        
+        await conn.sendMessage(from, { 
+            text: aliveMsg,
+            contextInfo: {
+                isForwarded: true,
+                forwardingScore: 999,
+                mentionedJid: [m.sender]
+            }
+        }, { quoted: mek });
+        
+        await conn.sendMessage(from, { react: { text: '✅', key: m.key } });
 
-const start = Date.now();
-
-const msg = `💖 ━━━〔 LIVE 〕━━━ 💖
-
-🤖 𝙉𝘼𝙒𝘼𝘡-𝙈𝘿
-💫 System Online
-
-⏱️ Ping : ${Date.now() - start} ms
-
-💖 ━━━━━━━━━━━━━ 💖`;
-
-return reply(msg);
-
+    } catch (e) {
+        console.error("Error in alive command:", e);
+        await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
+        await reply(`❌ Error: ${e.message}`);
+    }
 });
