@@ -26,7 +26,6 @@ cmd({
 
         const vid = search.videos[0]
 
-        // 🎨 🅽︎🅰︎🆆︎🅰︎🆉︎-🄼🄳 STYLE BOX
         const caption = `
 *╭ׂ┄─̇─̣┄─̇─̣┄─̇─̣┄─̇─̣┄─̇─̣─̇─̣─᛭*
 *│ ╌─̇─̣⊰  🅽︎🅰︎🆆︎🅰︎🆉︎-🄼🄳 ⊱┈─̇─̣╌*
@@ -52,7 +51,9 @@ cmd({
 
             if (!res.data?.status || !res.data?.result?.download) {
                 await conn.sendMessage(from, { react: { text: '❌', key: m.key } })
-                return reply("❌ API Error! Please try again later.")
+
+                // 🔴 ONLY CHANGED TEXT HERE
+                return reply("🕌 Only Islamic Audio Download Is Allowed")
             }
 
             const audioUrl = res.data.result.download
@@ -75,12 +76,16 @@ cmd({
         } catch (e) {
             console.log("❌ API Failed:", e.message)
             await conn.sendMessage(from, { react: { text: '❌', key: m.key } })
-            return reply("❌ API Error! Please try again later.")
+
+            // 🔴 ONLY CHANGED TEXT HERE
+            return reply("🕌 Only Islamic Audio Download Is Allowed")
         }
 
     } catch (err) {
         console.error("❌ SONG ERROR:", err)
         await conn.sendMessage(from, { react: { text: '❌', key: m.key } })
-        reply("❌ API Error! Please try again later.")
+
+        // 🔴 ONLY CHANGED TEXT HERE
+        reply("🕌 Only Islamic Audio Download Is Allowed")
     }
 })
