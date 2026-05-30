@@ -9,13 +9,20 @@ cmd({
     category: "download",
     react: "🎵",
     filename: __filename
-}, async (conn, mek, m, { from, reply, text }) => {
+}, async (conn, mek, m, { from, reply, text, args }) => {
 
     try {
 
         if (!text) {
             return reply("❌ Please Give Me A Song Name")
         }
+
+        // 🔥 DEFAULT MODE = AUDIO (ptt false)
+        let pttMode = false
+
+        // optional toggle (future use)
+        if (args[0] === "on") pttMode = true
+        if (args[0] === "off") pttMode = false
 
         const search = await yts(text)
 
@@ -39,20 +46,14 @@ cmd({
 > Powered By NAWAZ-MD
 `
 
-        await conn.sendMessage(
-            from,
-            {
-                image: { url: vid.thumbnail },
-                caption
-            },
-            { quoted: mek }
-        )
+        await conn.sendMessage(from, {
+            image: { url: vid.thumbnail },
+            caption
+        }, { quoted: mek })
 
         const apiUrl = `https://api.azbry.com/api/download/ytmp3?url=${encodeURIComponent(vid.url)}`
 
-        const response = await axios.get(apiUrl, {
-            timeout: 60000
-        })
+        const response = await axios.get(apiUrl, { timeout: 60000 })
 
         const audioUrl =
             response.data?.result?.download ||
@@ -66,21 +67,20 @@ cmd({
             return reply("❌ Download Link Not Found")
         }
 
-        const audio = await axios.get(audioUrl, {
+        const audioBuffer = await axios.get(audioUrl, {
             responseType: "arraybuffer",
             timeout: 120000
         })
 
-        await conn.sendMessage(
-            from,
-            {
-                audio: Buffer.from(audio.data),
-                mimetype: "audio/mpeg",
-                fileName: `${vid.title}.mp3`,
-                ptt: false
-            },
-            { quoted: mek }
-        )
+        const buffer = Buffer.from(audioBuffer.data)
+
+        // 🔥 FIXED WHATSAPP AUDIO SEND
+        await conn.sendMessage(from, {
+            audio: buffer,
+            mimetype: "audio/mpeg",
+            ptt: false, // ✅ DEFAULT = AUDIO PLAYER
+            fileName: `${vid.title}.mp3`
+        }, { quoted: mek })
 
         await conn.sendMessage(from, {
             react: {
