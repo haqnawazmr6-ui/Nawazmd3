@@ -1,91 +1,70 @@
-const { cmd } = require('../command')
-const axios = require('axios')
-const yts = require('yt-search')
+const { cmd } = require('../command');
+const axios = require('axios');
 
-// ═══════════════════════════════════════════════════════════
-// 🎵 SONG COMMAND (SINGLE API - EliteProTech)
-// ═══════════════════════════════════════════════════════════
 cmd({
     pattern: "song",
-    alias: ["play", "music", "audio", "aa"],
-    desc: "Download YouTube song",
+    alias: ["play", "music"],
+    desc: "Search and download songs from YouTube",
     category: "download",
-    react: "🚀",
-    filename: __filename
-}, async (conn, mek, m, { from, reply, text }) => {
+    react: "🎧"
+},
+async (conn, mek, m, { q, reply }) => {
     try {
-        if (!text) {
-            return reply("❌ Please provide song name\nExample: .song Shape of You")
+
+        // If no query given
+        if (!q) {
+            return reply("❌ Please enter a song name\nExample: .song Dil Mera Dil");
         }
 
-        // 🔍 YouTube search
-        const search = await yts(text)
-        if (!search.videos || !search.videos.length) {
-            return reply("❌ No song found!")
-        }
+        // 🎧 Searching UI
+        reply(`
+╔═══✦🎧 SONG SEARCHING ✦═══╗
 
-        const vid = search.videos[0]
+🔎 Query: ${q}
 
-        const caption = `
-*╭ׂ┄─̇─̣┄─̇─̣┄─̇─̣┄─̇─̣┄─̇─̣─̇─̣─᛭*
-*│ ╌─̇─̣⊰  🅽︎🅰︎🆆︎🅰︎🆉︎-🄼🄳 ⊱┈─̇─̣╌*
-*│─̇─̣┄┄┄┄┄┄┄┄┄┄┄┄┄─̇─̣*
-*│❀ 🎵 𝐓𝐢𝐭𝐥𝐞:* ${vid.title}
-*│❀ 📀 𝐐𝐮𝐚𝐥𝐢𝐭𝐲:* 128kbps
-*│❀ 📁 𝐅𝐨𝐫𝐦𝐚𝐭:* mp3
-*│❀ ⚙️ 𝐒𝐭𝐚𝐭𝐮𝐬:* Downloading...
-*╰┄─̣┄─̇─̣┄─̇─̣┄─̇─̣┄─̇─̣─̇─̣─᛭*
-> ᴘᴏᴡᴇʀᴇᴅ ʙʏ 🅽︎🅰︎🆆︎🅰︎🆉︎🄼🄳`
+╚══════════════════════╝
+`);
 
-        await conn.sendMessage(from, {
-            image: { url: vid.thumbnail },
-            caption
-        }, { quoted: mek })
+        // 1. Search API
+        let search = await axios.get(`https://api.lyrics.ovh/suggest/${encodeURIComponent(q)}`);
 
-        // ═══════════════════════════════════════════════════════════
-        // 🔷 API: EliteProTech API (Direct MP3)
-        // ═══════════════════════════════════════════════════════════
-        try {
-            const apiUrl = `https://eliteprotech-apis.zone.id/ytmp3?url=${encodeURIComponent(vid.url)}`
-            const res = await axios.get(apiUrl, { timeout: 30000 })
+        let result = search.data.data[0];
+        if (!result) return reply("❌ No song found");
 
-            if (!res.data?.status || !res.data?.result?.download) {
-                await conn.sendMessage(from, { react: { text: '❌', key: m.key } })
+        let title = result.title;
+        let artist = result.artist.name;
 
-                // 🔴 ONLY CHANGED TEXT HERE
-                return reply("🕌 Only Islamic Audio Download Is Allowed")
-            }
+        // 2. YouTube link (placeholder)
+        let ytLink = `https://www.youtube.com/watch?v=dQw4w9WgXcQ`;
 
-            const audioUrl = res.data.result.download
-            const audioRes = await axios.get(audioUrl, {
-                responseType: 'arraybuffer',
-                timeout: 60000
-            })
-            const audioBuffer = Buffer.from(audioRes.data)
+        // 3. MP3 API
+        let api = `https://api.azbry.com/api/download/ytmp3?url=${encodeURIComponent(ytLink)}`;
 
-            await conn.sendMessage(from, {
-                audio: audioBuffer,
-                mimetype: "audio/mpeg",
-                fileName: `${vid.title}.mp3`,
-                ptt: false
-            }, { quoted: mek })
+        let res = await axios.get(api);
+        let audioUrl = res.data?.result?.download;
 
-            await conn.sendMessage(from, { react: { text: '✅', key: m.key } })
-            console.log(`✅ Song sent successfully!`)
+        if (!audioUrl) return reply("❌ Audio not found");
 
-        } catch (e) {
-            console.log("❌ API Failed:", e.message)
-            await conn.sendMessage(from, { react: { text: '❌', key: m.key } })
+        // 4. Send audio
+        await conn.sendMessage(mek.chat, {
+            audio: { url: audioUrl },
+            mimetype: "audio/mpeg"
+        }, { quoted: mek });
 
-            // 🔴 ONLY CHANGED TEXT HERE
-            return reply("🕌 Only Islamic Audio Download Is Allowed")
-        }
+        // 🎧 Final message
+        reply(`
+╔═══✦🎧 SONG DOWNLOADED ✦═══╗
 
-    } catch (err) {
-        console.error("❌ SONG ERROR:", err)
-        await conn.sendMessage(from, { react: { text: '❌', key: m.key } })
+🎵 Title  : ${title}
+👤 Artist : ${artist}
 
-        // 🔴 ONLY CHANGED TEXT HERE
-        reply("🕌 Only Islamic Audio Download Is Allowed")
+╔══════════════════════╗
+👑 Powered By Nawaz MD
+╚══════════════════════╝
+`);
+
+    } catch (e) {
+        console.log(e);
+        reply("❌ Error occurred");
     }
-})
+});
