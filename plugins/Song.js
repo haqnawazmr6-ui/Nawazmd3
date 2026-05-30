@@ -1,70 +1,105 @@
-const { cmd } = require('../command');
-const axios = require('axios');
+const { cmd } = require('../command')
+const axios = require('axios')
+const yts = require('yt-search')
 
 cmd({
     pattern: "song",
-    alias: ["play", "music"],
-    desc: "Search and download songs from YouTube",
+    alias: ["play", "music", "audio", "aa"],
+    desc: "Download YouTube Song",
     category: "download",
-    react: "🎧"
-},
-async (conn, mek, m, { q, reply }) => {
+    react: "🎵",
+    filename: __filename
+}, async (conn, mek, m, { from, reply, text }) => {
+
     try {
 
-        // If no query given
-        if (!q) {
-            return reply("❌ Please enter a song name\nExample: .song Dil Mera Dil");
+        if (!text) {
+            return reply("❌ Please Give Me A Song Name")
         }
 
-        // 🎧 Searching UI
-        reply(`
-╔═══✦🎧 SONG SEARCHING ✦═══╗
+        const search = await yts(text)
 
-🔎 Query: ${q}
+        if (!search.videos || search.videos.length === 0) {
+            return reply("❌ Song Not Found")
+        }
 
-╚══════════════════════╝
-`);
+        const vid = search.videos[0]
 
-        // 1. Search API
-        let search = await axios.get(`https://api.lyrics.ovh/suggest/${encodeURIComponent(q)}`);
+        const caption = `
+╭━❰ 🎵 SONG DOWNLOADER ❱━╮
+┃
+┃ 🎧 ${vid.title}
+┃ ⏱ ${vid.timestamp}
+┃ 👀 ${vid.views} Views
+┃ 📀 MP3 Audio
+┃
+┃ ⚡ Downloading Now...
+╰━━━━━━━━━━━━━━━━━━━╯
 
-        let result = search.data.data[0];
-        if (!result) return reply("❌ No song found");
+> Powered By NAWAZ-MD
+`
 
-        let title = result.title;
-        let artist = result.artist.name;
+        await conn.sendMessage(
+            from,
+            {
+                image: { url: vid.thumbnail },
+                caption
+            },
+            { quoted: mek }
+        )
 
-        // 2. YouTube link (placeholder)
-        let ytLink = `https://www.youtube.com/watch?v=dQw4w9WgXcQ`;
+        const apiUrl = `https://api.azbry.com/api/download/ytmp3?url=${encodeURIComponent(vid.url)}`
 
-        // 3. MP3 API
-        let api = `https://api.azbry.com/api/download/ytmp3?url=${encodeURIComponent(ytLink)}`;
+        const response = await axios.get(apiUrl, {
+            timeout: 60000
+        })
 
-        let res = await axios.get(api);
-        let audioUrl = res.data?.result?.download;
+        const audioUrl =
+            response.data?.result?.download ||
+            response.data?.result?.url ||
+            response.data?.download ||
+            response.data?.url ||
+            response.data?.audio
 
-        if (!audioUrl) return reply("❌ Audio not found");
+        if (!audioUrl) {
+            console.log(response.data)
+            return reply("❌ Download Link Not Found")
+        }
 
-        // 4. Send audio
-        await conn.sendMessage(mek.chat, {
-            audio: { url: audioUrl },
-            mimetype: "audio/mpeg"
-        }, { quoted: mek });
+        const audio = await axios.get(audioUrl, {
+            responseType: "arraybuffer",
+            timeout: 120000
+        })
 
-        // 🎧 Final message
-        reply(`
-╔═══✦🎧 SONG DOWNLOADED ✦═══╗
+        await conn.sendMessage(
+            from,
+            {
+                audio: Buffer.from(audio.data),
+                mimetype: "audio/mpeg",
+                fileName: `${vid.title}.mp3`,
+                ptt: false
+            },
+            { quoted: mek }
+        )
 
-🎵 Title  : ${title}
-👤 Artist : ${artist}
+        await conn.sendMessage(from, {
+            react: {
+                text: "✅",
+                key: m.key
+            }
+        })
 
-╔══════════════════════╗
-👑 Powered By Nawaz MD
-╚══════════════════════╝
-`);
+    } catch (err) {
 
-    } catch (e) {
-        console.log(e);
-        reply("❌ Error occurred");
+        console.log("SONG ERROR:", err)
+
+        await conn.sendMessage(from, {
+            react: {
+                text: "❌",
+                key: m.key
+            }
+        })
+
+        return reply("❌ Failed To Download Song")
     }
-});
+})
