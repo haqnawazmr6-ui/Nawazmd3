@@ -126,7 +126,7 @@ ${menuSections}
                 isForwarded: true,
                 forwardingScore: 999,
                 forwardedNewsletterMessageInfo: {
-                    newsletterJid: "120363402493709861@newsletter",
+                    newsletterJid: "120363426829681935@newsletter",
                     newsletterName: "NawazTechX",
                     serverMessageId: Date.now()
                 }
@@ -143,7 +143,7 @@ ${menuSections}
                     isForwarded: true,
                     forwardingScore: 999,
                     forwardedNewsletterMessageInfo: {
-                        newsletterJid: "120363402493709861@newsletter",
+                        newsletterJid: "120363426829681935@newsletter",
                         newsletterName: "NawazTechX",
                         serverMessageId: Date.now()
                     }
