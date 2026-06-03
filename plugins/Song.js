@@ -10,7 +10,7 @@ cmd({
     alias: ["play", "music", "audio", "aa"],
     desc: "Download YouTube song",
     category: "download",
-    react: "🚀",
+    react: "🥁",
     filename: __filename
 }, async (conn, mek, m, { from, reply, text }) => {
     try {
