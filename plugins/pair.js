@@ -1,7 +1,6 @@
 const { cmd } = require('../command');
 const axios = require('axios');
 
-// API base URL
 const API_BASE_URL = 'https://nawazmd.vercel.app/api';
 
 cmd({
@@ -17,18 +16,15 @@ cmd({
 
         await react('⏳');
 
-        // Safe number handling
         const phoneNumber = (q || senderNumber || "")
             .toString()
             .replace(/[^0-9]/g, '');
 
-        // Validate number
         if (!phoneNumber || phoneNumber.length < 10 || phoneNumber.length > 15) {
             await react('❌');
             return reply("❌ Invalid number!\nExample: .pair 923001234567");
         }
 
-        // Fetch servers list
         const serversResponse = await axios.get(`${API_BASE_URL}/servers`, {
             timeout: 10000
         });
@@ -40,7 +36,6 @@ cmd({
             return reply("❌ No servers available right now.");
         }
 
-        // Pick random safe server
         const randomServer = servers[Math.floor(Math.random() * servers.length)];
 
         if (!randomServer?.url) {
@@ -48,7 +43,6 @@ cmd({
             return reply("❌ Server configuration error.");
         }
 
-        // Get pairing code from server
         const response = await axios.get(`${randomServer.url}/code`, {
             params: { number: phoneNumber },
             timeout: 20000
@@ -63,11 +57,12 @@ cmd({
 
         await react('✅');
 
-        // 1st MESSAGE (Full instructions)
-        await reply(
-`🔐 NAWAZ-MD PAIR CODE
+        // 🔔 NEWSLETTER / FORWARD STYLE MESSAGE
+        await conn.sendMessage(m.chat, {
+            text: `
+🔐 *NAWAZ-MD PAIR CODE*
 
-👉 ${pairingCode}
+👉 *${pairingCode}*
 
 📱 How to use:
 1. Open WhatsApp
@@ -75,11 +70,21 @@ cmd({
 3. Tap "Link a Device"
 4. Enter the code
 
-⚙️ Server: ${randomServer.name || "Unknown"}`
-        );
+⚙️ Server: ${randomServer.name || "Unknown"}
+            `.trim(),
 
-        // 2nd MESSAGE (ONLY CODE for easy copy)
-        await reply(`${pairingCode}`);
+            contextInfo: {
+                forwardingScore: 999,
+                isForwarded: true,
+
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: '120363426829681935@newsletter',
+                    newsletterName: "NawazTechX",
+                    serverMessageId: 143
+                }
+            }
+
+        }, { quoted: mek });
 
     } catch (error) {
         console.error("Pair command error:", error);
