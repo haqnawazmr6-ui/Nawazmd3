@@ -26,33 +26,31 @@ cmd({
 
         const vid = search.videos[0]
 
+        // 🎨 MODERN HACKER STYLE CAPTION
         const caption = `
-*╭ׂ┄─̇─̣┄─̇─̣┄─̇─̣┄─̇─̣┄─̇─̣─̇─̣─᛭*
-*│ ╌─̇─̣⊰  🅽︎🅰︎🆆︎🅰︎🆉︎-🄼🄳 ⊱┈─̇─̣╌*
-*│─̇─̣┄┄┄┄┄┄┄┄┄┄┄┄┄─̇─̣*
-*│❀ 🎵 𝐓𝐢𝐭𝐥𝐞:* ${vid.title}
-*│❀ 📀 𝐐𝐮𝐚𝐥𝐢𝐭𝐲:* 128kbps
-*│❀ 📁 𝐅𝐨𝐫𝐦𝐚𝐭:* mp3
-*│❀ ⚙️ 𝐒𝐭𝐚𝐭𝐮𝐬:* Downloading...
-*╰┄─̣┄─̇─̣┄─̇─̣┄─̇─̣┄─̇─̣─̇─̣─᛭*
-> ᴘᴏᴡᴇʀᴇᴅ ʙʏ 🅽︎🅰︎🆆︎🅰︎🆉︎🄼🄳`
+╭─❍
+│ 🎵 ${vid.title}
+│
+│ 📀 Quality : 128kbps
+│ 📁 Format  : MP3
+│ ⚡ Status  : Downloading
+╰───────────────
+
+> Powered By NAWAZ-MD
+`
 
         await conn.sendMessage(from, {
             image: { url: vid.thumbnail },
             caption
         }, { quoted: mek })
 
-        // ═══════════════════════════════════════════════════════════
-        // 🔷 API: EliteProTech API (Direct MP3)
-        // ═══════════════════════════════════════════════════════════
+        // API CALL
         try {
             const apiUrl = `https://api.azbry.com/api/download/ytmp3?url=${encodeURIComponent(vid.url)}`
             const res = await axios.get(apiUrl, { timeout: 30000 })
 
             if (!res.data?.status || !res.data?.result?.download) {
                 await conn.sendMessage(from, { react: { text: '❌', key: m.key } })
-
-                // 🔴 ONLY CHANGED TEXT HERE
                 return reply("🕌 Only Islamic Audio Download Is Allowed")
             }
 
@@ -61,6 +59,7 @@ cmd({
                 responseType: 'arraybuffer',
                 timeout: 60000
             })
+
             const audioBuffer = Buffer.from(audioRes.data)
 
             await conn.sendMessage(from, {
@@ -70,22 +69,29 @@ cmd({
                 ptt: false
             }, { quoted: mek })
 
-            await conn.sendMessage(from, { react: { text: '✅', key: m.key } })
-            console.log(`✅ Song sent successfully!`)
+            await conn.sendMessage(from, {
+                react: { text: '✅', key: m.key }
+            })
+
+            console.log("✅ Song sent successfully!")
 
         } catch (e) {
             console.log("❌ API Failed:", e.message)
-            await conn.sendMessage(from, { react: { text: '❌', key: m.key } })
 
-            // 🔴 ONLY CHANGED TEXT HERE
+            await conn.sendMessage(from, {
+                react: { text: '❌', key: m.key }
+            })
+
             return reply("🕌 Only Islamic Audio Download Is Allowed")
         }
 
     } catch (err) {
         console.error("❌ SONG ERROR:", err)
-        await conn.sendMessage(from, { react: { text: '❌', key: m.key } })
 
-        // 🔴 ONLY CHANGED TEXT HERE
+        await conn.sendMessage(from, {
+            react: { text: '❌', key: m.key }
+        })
+
         reply("🕌 Only Islamic Audio Download Is Allowed")
     }
 })
