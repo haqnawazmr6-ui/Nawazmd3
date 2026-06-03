@@ -5,7 +5,7 @@ const { cmd, commands } = require('../command');
 cmd({
     pattern: "alive",
     alias: ["live","update"],
-    desc: "Check bot's response time.",
+    desc: "Check bot status.",
     category: "main",
     react: "⚡",
     filename: __filename
@@ -14,7 +14,6 @@ cmd({
 async (conn, mek, m, { from, sender, reply }) => {
 
     try {
-        const start = Date.now();
 
         const reactionEmojis = ['🔥','⚡','🚀','💥','🎯','🎉'];
         const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
@@ -23,9 +22,11 @@ async (conn, mek, m, { from, sender, reply }) => {
             react: { text: "⚡", key: mek.key }
         });
 
-        const responseTime = Date.now() - start;
+        const text = `
+⚡ 𝗡𝗔𝗪𝗔𝗭-𝗠𝗗 𝗔𝗟𝗜𝗩𝗘
 
-        const text = `> *NAWAZ-MD SPEED: ${responseTime}ms Very Active ${reactionEmoji}*`;
+🔥 Status: Active & Running ${reactionEmoji}
+`.trim();
 
         await conn.sendMessage(from, {
             text,
