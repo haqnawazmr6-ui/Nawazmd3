@@ -57,10 +57,12 @@ cmd({
 
         await react('✅');
 
-        // 🔔 NEWSLETTER / FORWARD STYLE MESSAGE
+        // =========================
+        // MESSAGE 1 (WITH NEWSLETTER)
+        // =========================
         await conn.sendMessage(m.chat, {
             text: `
-🔐 *NAWAZ-MD PAIR CODE*
+🔐 > NAWAZ-MD PAIR CODE
 
 👉 *${pairingCode}*
 
@@ -76,7 +78,24 @@ cmd({
             contextInfo: {
                 forwardingScore: 999,
                 isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: '120363426829681935@newsletter',
+                    newsletterName: "NawazTechX",
+                    serverMessageId: 143
+                }
+            }
 
+        }, { quoted: mek });
+
+        // =========================
+        // MESSAGE 2 (ONLY CODE + NEWSLETTER)
+        // =========================
+        await conn.sendMessage(m.chat, {
+            text: `🔑 ${pairingCode}`,
+
+            contextInfo: {
+                forwardingScore: 999,
+                isForwarded: true,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: '120363426829681935@newsletter',
                     newsletterName: "NawazTechX",
