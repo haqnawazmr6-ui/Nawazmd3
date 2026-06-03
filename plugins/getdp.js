@@ -3,16 +3,12 @@ const { cmd } = require('../command');
 cmd({
     pattern: "gtdp",
     alias: ["getdp", "dp"],
-    desc: "Download profile picture of tagged/replied user or number",
+    desc: "Get WhatsApp profile picture of any user",
     category: "tools",
     react: "🖼️",
     filename: __filename
 },
-async (conn, mek, m, {
-    from,
-    q,
-    reply
-}) => {
+async (conn, mek, m, { from, q, reply }) => {
     try {
 
         let jid;
@@ -23,16 +19,17 @@ async (conn, mek, m, {
         }
 
         // Mention user
-        else if (m.mentionedJid && m.mentionedJid[0]) {
+        else if (m.mentionedJid && m.mentionedJid.length > 0) {
             jid = m.mentionedJid[0];
         }
 
-        // Number input
+        // Number input (global support)
         else if (q) {
+
             let num = q.replace(/[^0-9]/g, '');
 
-            if (!num.startsWith('92')) {
-                return reply('❌ Number 92 se start hona chahiye\n\nExample:\n.gtdp 923001234567');
+            if (!num || num.length < 8) {
+                return reply("❌ Invalid number format");
             }
 
             jid = num + "@s.whatsapp.net";
@@ -40,11 +37,10 @@ async (conn, mek, m, {
 
         else {
             return reply(
-`📌 *Use Example:*
+`📌 *Usage:*
 
 .gtdp 923001234567
-
-ya kisi message reply kar ke:
+Or reply to a message:
 .gtdp`
             );
         }
@@ -54,18 +50,20 @@ ya kisi message reply kar ke:
 
         try {
             pp = await conn.profilePictureUrl(jid, 'image');
-        } catch {
-            return reply("❌ User ki profile picture nahi mili ya private hai.");
+        } catch (err) {
+            return reply("❌ Profile picture is not available or is private");
         }
+
+        if (!pp) return reply("❌ DP not found");
 
         // Send image
         await conn.sendMessage(from, {
             image: { url: pp },
-            caption: `🖼️ *Profile Picture Downloaded Successfully*`
+            caption: `🖼️ *Profile Picture Retrieved Successfully*\n\n⚡ Powered By Nawaz MD`
         }, { quoted: mek });
 
     } catch (e) {
-        console.log(e);
+        console.log("gtdp error:", e);
         reply(`❌ Error: ${e.message}`);
     }
 });
