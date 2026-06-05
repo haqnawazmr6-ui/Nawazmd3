@@ -1,24 +1,47 @@
 const fs = require("fs");
 const path = require("path");
+const { cmd } = require("../command");
 
 cmd({
-    pattern: "setdp2",
-    desc: "Change Menu Image",
+    pattern: "menudp",
+    desc: "Change Menu Image (Bot Menu DP)",
     category: "owner",
     react: "🖼️",
     filename: __filename
 },
 async (conn, mek, m, { quoted, reply, isOwner }) => {
 
-    if (!isOwner) return reply("Owner Only");
+    try {
 
-    if (!quoted) return reply("Image ko reply karo");
+        if (!isOwner) {
+            return reply("❌ Owner only command");
+        }
 
-    const buffer = await quoted.download();
+        if (!quoted) {
+            return reply("❌ Please reply to an image");
+        }
 
-    const savePath = path.join(__dirname, "../lib/ERFAN.jpg");
+        const mime = quoted.mtype || quoted.message?.imageMessage?.mimetype || "";
 
-    fs.writeFileSync(savePath, buffer);
+        if (!mime.includes("image")) {
+            return reply("❌ Only image is allowed");
+        }
 
-    return reply("✅ Menu DP Updated Successfully");
+        const buffer = await quoted.download();
+
+        if (!buffer) {
+            return reply("❌ Image download failed");
+        }
+
+        const savePath = path.join(__dirname, "../lib/ERFAN.jpg");
+
+        fs.writeFileSync(savePath, buffer);
+
+        return reply("✅ Menu DP Updated Successfully!");
+
+    } catch (error) {
+        console.log(error);
+        return reply("❌ Error while updating Menu DP");
+    }
+
 });
