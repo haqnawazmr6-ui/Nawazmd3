@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 cmd({
-    pattern: "setdp",
+    pattern: "setdp2",
     desc: "Change Menu Image",
     category: "owner",
     react: "🖼️",
