@@ -58,7 +58,7 @@ async (conn, mek, m, { from, sender, reply }) => {
 
         const responseTime = Date.now() - start;
 
-        const text = `> *${styleText("NAWAZ-MD SPEED")}: ${responseTime}ms ${reactionEmoji}*`;
+        const text = `> *${styleText("NAWAZ MD MINI BOT SPEED")}: ${responseTime}ms ${reactionEmoji}*`;
 
         await conn.sendMessage(from, {
             text,
@@ -104,7 +104,7 @@ async (conn, mek, m, { from, reply }) => {
         else status = "🐢 Slow Response";
 
         const msg = `
-╭┈──〔 ⚡ ${styleText("NAWAZ-MD PING")} 〕─⊷
+╭┈──〔 ⚡ ${styleText("NAWAZ MD MINI BOT PING")} 〕─⊷
 ├▢ 📶 ${styleText("Response")}: ${ping} ms
 ├▢ 🧠 ${styleText("Status")}: ${status}
 ├▢ 💫 ${styleText("Mode")}: Active & Stable
