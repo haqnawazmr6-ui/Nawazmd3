@@ -6,7 +6,7 @@ const fs = require('fs');
 const {runtime} = require('../lib/functions')
 const axios = require('axios')
 
-// 🔥 Small caps
+// 🔥 Small caps base (default)
 const toSmallCaps = (text) => {
     if (!text || typeof text !== 'string') return '';
     const smallCapsMap = {
@@ -20,22 +20,31 @@ const toSmallCaps = (text) => {
     return text.split('').map(c => smallCapsMap[c] || c).join('');
 };
 
+// ✨ Extra font styles
+const fonts = [
+    (t) => toSmallCaps(t), // style 1 (default)
+    (t) => t.toUpperCase(), // style 2
+    (t) => t.split('').join(' '), // style 3 spaced letters
+];
+
+// 🎲 Random font picker
+const randomFont = () => fonts[Math.floor(Math.random() * fonts.length)];
+
 // Category format
-const formatCategory = (category, cmds) => {
+const formatCategory = (category, cmds, styleFn) => {
 
     const validCmds = cmds.filter(cmd => cmd.pattern && cmd.pattern.trim() !== '');
     if (validCmds.length === 0) return '';
 
-    let title = `\n▰▰▰『 ${toSmallCaps(category.toUpperCase())} 』▰▰▰\n`;
+    let title = `\n▰▰▰『 ${styleFn(category.toUpperCase())} 』▰▰▰\n`;
 
-    let body = validCmds.map(cmd => `➥ .${toSmallCaps(cmd.pattern || '')}`).join('\n');
+    let body = validCmds.map(cmd => `➥ .${styleFn(cmd.pattern || '')}`).join('\n');
 
     let footer = `\n▰▰▰▰▰▰▰▰▰▰`;
 
     return `${title}${body}${footer}`;
 };
 
-// Image check
 const isValidImageUrl = (url) => {
     if (!url || typeof url !== 'string' || url.trim() === '') return false;
     return ['.jpg','.jpeg','.png','.gif','.webp'].some(ext =>
@@ -49,7 +58,7 @@ cmd({
     use: '.menu',
     desc: "Show all bot commands",
     category: "main",
-    react: "🔣",
+    react: "🖥️",
     filename: __filename
 },
 async (conn, mek, m, { from, reply, userConfig }) => {
@@ -74,8 +83,10 @@ async (conn, mek, m, { from, reply, userConfig }) => {
 
         let menuSections = '';
 
+        const styleFn = randomFont(); // 🔥 RANDOM STYLE EACH TIME
+
         for (const [category, cmds] of Object.entries(categorized)) {
-            menuSections += formatCategory(category, cmds);
+            menuSections += formatCategory(category, cmds, styleFn);
         }
 
         const BOT_NAME = userConfig?.BOT_NAME || config.BOT_NAME || "Bot";
@@ -89,9 +100,6 @@ async (conn, mek, m, { from, reply, userConfig }) => {
             userConfig?.BOT_IMAGE ||
             config.BOT_IMAGE ||
             config.BOT_MEDIA_URL;
-
-        // 🔊 AUDIO URL 👉 یہاں اپنا آڈیو یو آر ایل لگاؤ
-        const BOT_AUDIO = "https://files.catbox.moe/nhhpue";
 
         let dec = `▰▰▰『 ${BOT_NAME} 』▰▰▰
 
@@ -118,7 +126,6 @@ ${menuSections}
             } catch {}
         }
 
-        // 📱 MENU SEND FIRST
         await conn.sendMessage(from, {
             image: { url: imageToUse },
             caption: dec,
@@ -132,24 +139,6 @@ ${menuSections}
                 }
             }
         }, { quoted: mek });
-
-        // 🔊 AUDIO SEND AFTER MENU
-        if (BOT_AUDIO && BOT_AUDIO.startsWith("http")) {
-            await conn.sendMessage(from, {
-                audio: { url: BOT_AUDIO },
-                mimetype: "audio/mp4",
-                ptt: false,
-                contextInfo: {
-                    isForwarded: true,
-                    forwardingScore: 999,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: "120363426829681935@newsletter",
-                        newsletterName: "NawazTechX",
-                        serverMessageId: Date.now()
-                    }
-                }
-            }, { quoted: mek });
-        }
 
     } catch (e) {
         console.log(e);
