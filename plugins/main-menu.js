@@ -6,45 +6,22 @@ const fs = require('fs');
 const {runtime} = require('../lib/functions')
 const axios = require('axios')
 
-// 🔥 Small caps base (default)
-const toSmallCaps = (text) => {
-    if (!text || typeof text !== 'string') return '';
-    const smallCapsMap = {
-        'a': 'ᴀ','b':'ʙ','c':'ᴄ','d':'ᴅ','e':'ᴇ','f':'ғ','g':'ɢ','h':'ʜ','i':'ɪ',
-        'j':'ᴊ','k':'ᴋ','l':'ʟ','m':'ᴍ','n':'ɴ','o':'ᴏ','p':'ᴘ','q':'ǫ','r':'ʀ',
-        's':'s','t':'ᴛ','u':'ᴜ','v':'ᴠ','w':'ᴡ','x':'x','y':'ʏ','z':'ᴢ',
-        'A':'ᴀ','B':'ʙ','C':'ᴄ','D':'ᴅ','E':'ᴇ','F':'ғ','G':'ɢ','H':'ʜ','I':'ɪ',
-        'J':'ᴊ','K':'ᴋ','L':'ʟ','M':'ᴍ','N':'ɴ','O':'ᴏ','P':'ᴘ','Q':'ǫ','R':'ʀ',
-        'S':'s','T':'ᴛ','U':'ᴜ','V':'ᴠ','W':'ᴡ','X':'x','Y':'ʏ','Z':'ᴢ'
-    };
-    return text.split('').map(c => smallCapsMap[c] || c).join('');
-};
-
-// ✨ Extra font styles
-const fonts = [
-    (t) => toSmallCaps(t), // style 1 (default)
-    (t) => t.toUpperCase(), // style 2
-    (t) => t.split('').join(' '), // style 3 spaced letters
-];
-
-// 🎲 Random font picker
-const randomFont = () => fonts[Math.floor(Math.random() * fonts.length)];
-
 // Category format
-const formatCategory = (category, cmds, styleFn) => {
+const formatCategory = (category, cmds) => {
 
     const validCmds = cmds.filter(cmd => cmd.pattern && cmd.pattern.trim() !== '');
     if (validCmds.length === 0) return '';
 
-    let title = `\n▰▰▰『 ${styleFn(category.toUpperCase())} 』▰▰▰\n`;
+    let title = `\n▰▰▰『 ${category.toUpperCase()} 』▰▰▰\n`;
 
-    let body = validCmds.map(cmd => `➥ .${styleFn(cmd.pattern || '')}`).join('\n');
+    let body = validCmds.map(cmd => `➥ .${cmd.pattern || ''}`).join('\n');
 
     let footer = `\n▰▰▰▰▰▰▰▰▰▰`;
 
     return `${title}${body}${footer}`;
 };
 
+// Image check
 const isValidImageUrl = (url) => {
     if (!url || typeof url !== 'string' || url.trim() === '') return false;
     return ['.jpg','.jpeg','.png','.gif','.webp'].some(ext =>
@@ -83,10 +60,8 @@ async (conn, mek, m, { from, reply, userConfig }) => {
 
         let menuSections = '';
 
-        const styleFn = randomFont(); // 🔥 RANDOM STYLE EACH TIME
-
         for (const [category, cmds] of Object.entries(categorized)) {
-            menuSections += formatCategory(category, cmds, styleFn);
+            menuSections += formatCategory(category, cmds);
         }
 
         const BOT_NAME = userConfig?.BOT_NAME || config.BOT_NAME || "Bot";
@@ -126,9 +101,29 @@ ${menuSections}
             } catch {}
         }
 
+        // 🔘 CLICKABLE BUTTON MENU
         await conn.sendMessage(from, {
             image: { url: imageToUse },
             caption: dec,
+            footer: `${BOT_NAME} Menu`,
+            buttons: [
+                {
+                    buttonId: ".menu",
+                    buttonText: { displayText: "📜 MENU" },
+                    type: 1
+                },
+                {
+                    buttonId: ".owner",
+                    buttonText: { displayText: "👤 OWNER" },
+                    type: 1
+                },
+                {
+                    buttonId: ".ping",
+                    buttonText: { displayText: "⚡ PING" },
+                    type: 1
+                }
+            ],
+            headerType: 4,
             contextInfo: {
                 isForwarded: true,
                 forwardingScore: 999,
