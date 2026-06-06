@@ -23,7 +23,7 @@ async function uploadToUguu(filePath) {
 }
 
 cmd({
-    pattern: "url",
+    pattern: "Nurl",
     desc: "Convert replied media (image/audio/video/sticker) into URL",
     category: "tools",
     react: "🔗",
