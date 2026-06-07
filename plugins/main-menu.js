@@ -3,7 +3,7 @@ const { cmd, commands } = require('../command');
 const path = require('path');
 const os = require("os")
 const fs = require('fs');
-const { runtime } = require('../lib/functions')
+const {runtime} = require('../lib/functions')
 const axios = require('axios')
 
 // Category format
@@ -12,30 +12,26 @@ const formatCategory = (category, cmds) => {
     const validCmds = cmds.filter(cmd => cmd.pattern && cmd.pattern.trim() !== '');
     if (validCmds.length === 0) return '';
 
-    let title = `
+    let title = `\n▰▰▰『 ${category.toUpperCase()} 』▰▰▰\n`;
 
-╔════════════════════╗
-   📂 ${category.toUpperCase()}
-╚════════════════════╝`;
+    let body = validCmds.map(cmd => `➥ .${cmd.pattern || ''}`).join('\n');
 
-    let body = validCmds.map(cmd => `┃ ➤ .${cmd.pattern || ''}`).join('\n');
+    let footer = `\n▰▰▰▰▰▰▰▰▰▰`;
 
-    let footer = `\n┗━━━━━━━━━━━━━━━━━━━`;
-
-    return `${title}\n${body}${footer}`;
+    return `${title}${body}${footer}`;
 };
 
 // Image check
 const isValidImageUrl = (url) => {
     if (!url || typeof url !== 'string' || url.trim() === '') return false;
-    return ['.jpg', '.jpeg', '.png', '.gif', '.webp'].some(ext =>
+    return ['.jpg','.jpeg','.png','.gif','.webp'].some(ext =>
         url.toLowerCase().endsWith(ext)
     );
 };
 
 cmd({
     pattern: "menu",
-    alias: ["m", "help", "allmenu", "fullmenu"],
+    alias: ["m","help","allmenu","fullmenu"],
     use: '.menu',
     desc: "Show all bot commands",
     category: "main",
@@ -80,24 +76,20 @@ async (conn, mek, m, { from, reply, userConfig }) => {
             config.BOT_IMAGE ||
             config.BOT_MEDIA_URL;
 
-        let dec = `╔════════════════════╗
-      🤖 ${BOT_NAME.toUpperCase()}
-        MENU PANEL
-╚════════════════════╝
+        let dec = `▰▰▰『 ${BOT_NAME} 』▰▰▰
 
-👑 Owner   : ${OWNER_NAME}
-📜 Commands: ${totalCommands}
-⚡ Runtime : ${runtime(process.uptime())}
-🔰 Prefix  : ${PREFIX}
-🌐 Mode    : ${MODE}
-🚀 Version : ${VERSION}
+╭─❍ ʙᴏᴛ ɪɴғᴏ
+│ ➥ Owner : ${OWNER_NAME}
+│ ➥ Commands : ${totalCommands}
+│ ➥ Runtime : ${runtime(process.uptime())}
+│ ➥ Prefix : ${PREFIX}
+│ ➥ Mode : ${MODE}
+│ ➥ Version : ${VERSION}
+╰────────────
 
-━━━━━━━━━━━━━━━━━━━━
 ${menuSections}
 
-╔════════════════════╗
-      NAWAZ TECH MD
-╚════════════════════╝
+▰▰▰▰▰▰▰▰▰▰
 > ${DESCRIPTION || ''}`;
 
         let imageToUse = path.join(__dirname, '../lib/ERFAN.jpg');
