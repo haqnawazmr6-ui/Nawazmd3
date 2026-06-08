@@ -1,32 +1,17 @@
 const config = require('../config')
 const { cmd, commands } = require('../command');
-const path = require('path');
-const os = require("os")
-const fs = require('fs');
 const { runtime } = require('../lib/functions')
-const axios = require('axios')
 
-// Category format
 const formatCategory = (category, cmds) => {
 
     const validCmds = cmds.filter(cmd => cmd.pattern && cmd.pattern.trim() !== '');
     if (validCmds.length === 0) return '';
 
     let title = `\n▰▰▰『 ${category.toUpperCase()} 』▰▰▰\n`;
-
     let body = validCmds.map(cmd => `➥ .${cmd.pattern || ''}`).join('\n');
-
     let footer = `\n▰▰▰▰▰▰▰▰▰▰`;
 
     return `${title}${body}${footer}`;
-};
-
-// Image check
-const isValidImageUrl = (url) => {
-    if (!url || typeof url !== 'string' || url.trim() === '') return false;
-    return ['.jpg', '.jpeg', '.png', '.gif', '.webp'].some(ext =>
-        url.toLowerCase().endsWith(ext)
-    );
 };
 
 cmd({
@@ -71,20 +56,17 @@ async (conn, mek, m, { from, reply, userConfig }) => {
         const VERSION = userConfig?.VERSION || config.VERSION || "1.0.0";
         const DESCRIPTION = userConfig?.DESCRIPTION || config.DESCRIPTION || "";
 
+        // 🔥 IMAGE (FAST SAFE)
         const BOT_IMAGE =
             userConfig?.BOT_IMAGE ||
             config.BOT_IMAGE ||
             config.BOT_MEDIA_URL;
 
-        // 🔥 YAHAN APNI DP KA URL LAGA DO
-        const DEFAULT_MENU_IMAGE = "https://files.catbox.moe/an67z4.png";
+        const DEFAULT_IMAGE = "https://files.catbox.moe/an67z4.png";
 
-        let imageToUse = BOT_IMAGE || DEFAULT_MENU_IMAGE;
-
-        // invalid URL fallback
-        if (!isValidImageUrl(imageToUse)) {
-            imageToUse = DEFAULT_MENU_IMAGE;
-        }
+        let imageToUse = (BOT_IMAGE && typeof BOT_IMAGE === 'string')
+            ? BOT_IMAGE
+            : DEFAULT_IMAGE;
 
         let dec = `▰▰▰『 ${BOT_NAME} 』▰▰▰
 
@@ -107,21 +89,9 @@ ${menuSections}
             caption: dec,
             footer: `${BOT_NAME} Menu`,
             buttons: [
-                {
-                    buttonId: ".menu",
-                    buttonText: { displayText: "📜 MENU" },
-                    type: 1
-                },
-                {
-                    buttonId: ".owner",
-                    buttonText: { displayText: "👤 OWNER" },
-                    type: 1
-                },
-                {
-                    buttonId: ".ping",
-                    buttonText: { displayText: "⚡ PING" },
-                    type: 1
-                }
+                { buttonId: ".menu", buttonText: { displayText: "📜 MENU" }, type: 1 },
+                { buttonId: ".owner", buttonText: { displayText: "👤 OWNER" }, type: 1 },
+                { buttonId: ".ping", buttonText: { displayText: "⚡ PING" }, type: 1 }
             ],
             headerType: 4,
             contextInfo: {
