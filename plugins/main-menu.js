@@ -3,7 +3,7 @@ const { cmd, commands } = require('../command');
 const path = require('path');
 const os = require("os")
 const fs = require('fs');
-const {runtime} = require('../lib/functions')
+const { runtime } = require('../lib/functions')
 const axios = require('axios')
 
 // Category format
@@ -24,14 +24,14 @@ const formatCategory = (category, cmds) => {
 // Image check
 const isValidImageUrl = (url) => {
     if (!url || typeof url !== 'string' || url.trim() === '') return false;
-    return ['.jpg','.jpeg','.png','.gif','.webp'].some(ext =>
+    return ['.jpg', '.jpeg', '.png', '.gif', '.webp'].some(ext =>
         url.toLowerCase().endsWith(ext)
     );
 };
 
 cmd({
     pattern: "menu",
-    alias: ["m","help","allmenu","fullmenu"],
+    alias: ["m", "help", "allmenu", "fullmenu"],
     use: '.menu',
     desc: "Show all bot commands",
     category: "main",
@@ -76,6 +76,16 @@ async (conn, mek, m, { from, reply, userConfig }) => {
             config.BOT_IMAGE ||
             config.BOT_MEDIA_URL;
 
+        // 🔥 YAHAN APNI DP KA URL LAGA DO
+        const DEFAULT_MENU_IMAGE = "https://files.catbox.moe/an67z4.png";
+
+        let imageToUse = BOT_IMAGE || DEFAULT_MENU_IMAGE;
+
+        // invalid URL fallback
+        if (!isValidImageUrl(imageToUse)) {
+            imageToUse = DEFAULT_MENU_IMAGE;
+        }
+
         let dec = `▰▰▰『 ${BOT_NAME} 』▰▰▰
 
 ╭─❍ ʙᴏᴛ ɪɴғᴏ
@@ -92,16 +102,6 @@ ${menuSections}
 ▰▰▰▰▰▰▰▰▰▰
 > ${DESCRIPTION || ''}`;
 
-        let imageToUse = path.join(__dirname, '../lib/ERFAN.jpg');
-
-        if (isValidImageUrl(BOT_IMAGE)) {
-            try {
-                await axios.head(BOT_IMAGE, { timeout: 3000 });
-                imageToUse = BOT_IMAGE;
-            } catch {}
-        }
-
-        // 🔘 CLICKABLE BUTTON MENU
         await conn.sendMessage(from, {
             image: { url: imageToUse },
             caption: dec,
