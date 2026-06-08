@@ -57,12 +57,6 @@ async (conn, mek, m, { from, reply, userConfig }) => {
         const VERSION = userConfig?.VERSION || config.VERSION || "1.0.0";
         const DESCRIPTION = userConfig?.DESCRIPTION || config.DESCRIPTION || "";
 
-        // ⚡ FAST IMAGE SYSTEM
-        let imageToUse =
-            userConfig?.BOT_IMAGE ||
-            config.BOT_IMAGE ||
-            "https://files.catbox.moe/an67z4.png";
-
         let dec = `▰▰▰『 ${BOT_NAME} 』▰▰▰
 
 ╭─❍ ʙᴏᴛ ɪɴғᴏ
@@ -79,16 +73,28 @@ ${menuSections}
 ▰▰▰▰▰▰▰▰▰▰
 > ${DESCRIPTION || ''}`;
 
+        // ⚡ FAST TEXT MENU ONLY
         await conn.sendMessage(from, {
-            image: { url: imageToUse },
-            caption: dec,
+            text: dec,
             footer: `${BOT_NAME} Menu`,
             buttons: [
-                { buttonId: ".menu", buttonText: { displayText: "📜 MENU" }, type: 1 },
-                { buttonId: ".owner", buttonText: { displayText: "👤 OWNER" }, type: 1 },
-                { buttonId: ".ping", buttonText: { displayText: "⚡ PING" }, type: 1 }
+                {
+                    buttonId: ".menu",
+                    buttonText: { displayText: "📜 MENU" },
+                    type: 1
+                },
+                {
+                    buttonId: ".owner",
+                    buttonText: { displayText: "👤 OWNER" },
+                    type: 1
+                },
+                {
+                    buttonId: ".ping",
+                    buttonText: { displayText: "⚡ PING" },
+                    type: 1
+                }
             ],
-            headerType: 4,
+            headerType: 1,
             contextInfo: {
                 isForwarded: true,
                 forwardingScore: 999,
