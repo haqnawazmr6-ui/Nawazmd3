@@ -1,7 +1,8 @@
 const config = require('../config')
-const { cmd, commands } = require('../command');
+const { cmd, commands } = require('../command')
 const { runtime } = require('../lib/functions')
 
+// Category format
 const formatCategory = (category, cmds) => {
 
     const validCmds = cmds.filter(cmd => cmd.pattern && cmd.pattern.trim() !== '');
@@ -56,17 +57,11 @@ async (conn, mek, m, { from, reply, userConfig }) => {
         const VERSION = userConfig?.VERSION || config.VERSION || "1.0.0";
         const DESCRIPTION = userConfig?.DESCRIPTION || config.DESCRIPTION || "";
 
-        // 🔥 IMAGE (FAST SAFE)
-        const BOT_IMAGE =
+        // ⚡ FAST IMAGE SYSTEM
+        let imageToUse =
             userConfig?.BOT_IMAGE ||
             config.BOT_IMAGE ||
-            config.BOT_MEDIA_URL;
-
-        const DEFAULT_IMAGE = "https://files.catbox.moe/an67z4.png";
-
-        let imageToUse = (BOT_IMAGE && typeof BOT_IMAGE === 'string')
-            ? BOT_IMAGE
-            : DEFAULT_IMAGE;
+            "https://files.catbox.moe/an67z4.png";
 
         let dec = `▰▰▰『 ${BOT_NAME} 』▰▰▰
 
