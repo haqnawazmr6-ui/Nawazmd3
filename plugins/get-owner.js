@@ -1,43 +1,40 @@
 const { cmd } = require('../command');
-const config = require('../config');
-const { sleep } = require('../lib/functions');
 
 cmd({
-  pattern: "owner",
-  desc: "Get owner number",
-  category: "main",
-  react: "💀",
-  filename: __filename
-}, async (sock, m, msg, { from, userConfig }) => {
-  try {
-    // Get values from userConfig with fallback to config
-    const OWNER_NUMBER = userConfig?.OWNER_NUMBER || config.OWNER_NUMBER || "923161483125";
-    const OWNER_NAME = userConfig?.OWNER_NAME || config.OWNER_NAME || "Bot Owner";
-    const TEAM_NAME = "NAWAZ-MD TEAM"; // Direct hardcoded as requested
+pattern: "owner",
+desc: "Get owner number",
+category: "main",
+react: "💀",
+filename: __filename
+}, async (sock, m, msg, { from }) => {
+try {
 
-    await sock.sendPresenceUpdate("composing", from);
+const OWNER_NUMBER = "923178856224";
+const OWNER_NAME = "Nawaz Tech";
+const TEAM_NAME = "NAWAZ TECH MD";
 
-    const vcard =
-      'BEGIN:VCARD\n' +
-      'VERSION:3.0\n' +
-      `FN:${OWNER_NAME}\n` +
-      `ORG:${TEAM_NAME};\n` +
-      `TEL;type=CELL;type=VOICE;waid=${OWNER_NUMBER}:${'+' + OWNER_NUMBER}\n` +
-      'END:VCARD';
+await sock.sendPresenceUpdate("composing", from);
 
-    await sock.sendMessage(from, {
-      contacts: {
-        displayName: OWNER_NAME,
-        contacts: [{ vcard }]
-      }
-    });
+const vcard =
+  'BEGIN:VCARD\n' +
+  'VERSION:3.0\n' +
+  `FN:${OWNER_NAME}\n` +
+  `ORG:${TEAM_NAME};\n` +
+  `TEL;type=CELL;type=VOICE;waid=${OWNER_NUMBER}:+${OWNER_NUMBER}\n` +
+  'END:VCARD';
 
-    await sock.sendMessage(from, { react: { text: "✅", key: m.key } });
-
-  } catch (e) {
-    console.error("Error sending contact:", e);
-    await sock.sendMessage(from, {
-      text: `❌ Couldn't send contact:\n${e.message}`
-    });
+await sock.sendMessage(from, {
+  contacts: {
+    displayName: OWNER_NAME,
+    contacts: [{ vcard }]
   }
+});
+
+await sock.sendMessage(from, {
+  react: { text: "✅", key: m.key }
+});
+
+} catch (e) {
+console.error(e);
+}
 });
