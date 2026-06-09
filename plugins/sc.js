@@ -9,7 +9,7 @@ cmd({
 },
 async (conn, mek, m, { from }) => {
 
-    const ownerNumber = "923161483125";
+    const ownerNumber = "923087069523";
     const serverLink = "https://nawazmd.vercel.app/";
 
     const message = `
