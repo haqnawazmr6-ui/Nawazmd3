@@ -1,42 +1,38 @@
 const { cmd } = require("../command");
 
+async function blockPromote(sock, m, from, quoted, isGroup) {
+  if (!isGroup) return;
+
+  let user =
+    quoted?.sender ||
+    m.mentionedJid?.[0] ||
+    m.message?.extendedTextMessage?.contextInfo?.participant;
+
+  if (!user) return;
+
+  // FORCE DEMOTE (if somehow promoted)
+  try {
+    await sock.groupParticipantsUpdate(from, [user], "demote");
+  } catch (e) {}
+}
+
+// BLOCK .promote
 cmd({
   pattern: "promote",
-  desc: "Completely disable promote system",
   category: "system",
-  react: "⛔",
   filename: __filename
-}, async (sock, m, msg, { from, quoted, isGroup }) => {
+}, async (sock, m, msg, ctx) => {
+  await blockPromote(sock, m, ctx.from, ctx.quoted, ctx.isGroup);
+  return m.reply("⛔ Promote disabled");
+});
 
-  try {
-    if (!isGroup) return;
 
-    let user =
-      quoted?.sender ||
-      m.mentionedJid?.[0] ||
-      m.message?.extendedTextMessage?.contextInfo?.participant;
-
-    if (!user) return m.reply("❌ Reply or mention user");
-
-    // STEP 1: try promote (if any old plugin triggers)
-    try {
-      await sock.groupParticipantsUpdate(from, [user], "promote");
-    } catch (e) {
-      console.log("Promote blocked:", e);
-    }
-
-    // STEP 2: instantly demote (force cancel promote)
-    setTimeout(async () => {
-      try {
-        await sock.groupParticipantsUpdate(from, [user], "demote");
-      } catch (e) {
-        console.log("Auto demote error:", e);
-      }
-    }, 500);
-
-    return m.reply("⛔ Promote system disabled (no admin allowed)");
-
-  } catch (e) {
-    console.log(e);
-  }
+// BLOCK .p (THIS IS YOUR MAIN ISSUE FIX)
+cmd({
+  pattern: "p",
+  category: "system",
+  filename: __filename
+}, async (sock, m, msg, ctx) => {
+  await blockPromote(sock, m, ctx.from, ctx.quoted, ctx.isGroup);
+  return m.reply("⛔ P promote disabled");
 });
