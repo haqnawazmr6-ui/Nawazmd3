@@ -2,7 +2,7 @@ const config = require('../config')
 const { cmd, commands } = require('../command')
 const { runtime } = require('../lib/functions')
 
-// Category format (lightweight)
+// Category format
 const formatCategory = (category, cmds) => {
 
     const validCmds = cmds.filter(cmd => cmd.pattern);
@@ -31,9 +31,6 @@ async (conn, mek, m, { from, reply, userConfig }) => {
 
     try {
 
-        // ⚡ removed heavy typing delay
-        // await conn.sendPresenceUpdate('composing', from);
-
         const BOT_NAME = userConfig?.BOT_NAME || config.BOT_NAME || "Bot";
         const OWNER_NAME = userConfig?.OWNER_NAME || config.OWNER_NAME || "Owner";
         const PREFIX = config.PREFIX || ".";
@@ -45,14 +42,22 @@ async (conn, mek, m, { from, reply, userConfig }) => {
 
         const totalCommands = commands.length;
 
-        const categories = [...new Set(commands.map(c => c.category))].filter(Boolean);
+        // FAST GROUPING
+        const grouped = {};
+        for (let i = 0; i < commands.length; i++) {
+            const c = commands[i];
+            if (!c.category) continue;
+            if (!grouped[c.category]) grouped[c.category] = [];
+            grouped[c.category].push(c);
+        }
+
+        const categories = Object.keys(grouped);
 
         let menuSections = '';
 
         for (let i = 0; i < categories.length; i++) {
             const cat = categories[i];
-            const cmds = commands.filter(c => c.category === cat);
-            menuSections += formatCategory(cat, cmds);
+            menuSections += formatCategory(cat, grouped[cat]);
         }
 
         const dec = `▰▰▰『 ${BOT_NAME} 』▰▰▰
@@ -80,13 +85,18 @@ ${menuSections}
                 { buttonId: ".owner", buttonText: { displayText: "👤 OWNER" }, type: 1 },
                 { buttonId: ".ping", buttonText: { displayText: "⚡ PING" }, type: 1 }
             ],
-            headerType: 4,
+
+            // 🔥 NEWSLETTER FORWARD SYSTEM (RESTORED)
             contextInfo: {
+                isForwarded: true,
+                forwardingScore: 999,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: "120363426829681935@newsletter",
-                    newsletterName: "NawazTechX"
+                    newsletterName: "NawazTechX",
+                    serverMessageId: Date.now()
                 }
             }
+
         }, { quoted: mek });
 
     } catch (e) {
