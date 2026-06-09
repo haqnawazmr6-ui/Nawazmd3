@@ -3,7 +3,8 @@ const axios = require("axios");
 
 cmd({
     pattern: "play",
-    desc: "YouTube music downloader",
+    alias: ["song", "music", "s", "audio"],
+    desc: "Smart YouTube music downloader",
     category: "music",
     react: "🎧",
     filename: __filename
@@ -13,7 +14,7 @@ async (conn, mek, m, { from, args, reply }) => {
     try {
 
         if (!args[0]) {
-            return reply("❌ Song name likho\nExample: .play faded");
+            return reply("❌ Song likho\nExample: .play faded");
         }
 
         let query = encodeURIComponent(args.join(" "));
@@ -32,29 +33,27 @@ async (conn, mek, m, { from, args, reply }) => {
             return reply("❌ Audio not found");
         }
 
-        let title = result.title || "Unknown";
-        let channel = result.channel || "Unknown";
-        let duration = result.duration || "00:00";
+        let title = result.title;
+        let channel = result.channel;
+        let duration = result.duration;
         let thumb = result.thumbnail;
         let audioUrl = result.download.audio;
 
-        let text = `┏━━━━━━━━━━━━━━━━━━━━┓
-┃ ⚡ 𝗡𝗔𝗪𝗔𝗭 𝗠𝗗 ⚡
-┗━━━━━━━━━━━━━━━━━━━━┛
+        // 🎨 VIP BOX STYLE (your selected style #2)
+        let text = `╔══════════════════════╗
+║   🎧 NAWAZ MD MUSIC   ║
+╚══════════════════════╝
 
-🎧 SONG DETECTED
+🎶 ${title}
+👤 ${channel}
+⏱ ${duration}
 
-❯ 🎶 ${title}
-❯ 👤 ${channel}
-❯ ⏱ ${duration}
+━━━━━━━━━━━━━━━━━━
+⚡ Processing Audio...
+🚀 Sending Now
+━━━━━━━━━━━━━━━━━━`;
 
-⬇️ Downloading...
-[■■■■■■■■■■] 100%
-
-🚀 Audio Ready
-━━━━━━━━━━━━━━━━`;
-
-        // 📌 IMAGE + NEWSLETTER STYLE
+        // 📌 IMAGE SEND (NEWSLETTER STYLE)
         await conn.sendMessage(from, {
             image: { url: thumb },
             caption: text,
@@ -69,7 +68,7 @@ async (conn, mek, m, { from, args, reply }) => {
             }
         }, { quoted: mek });
 
-        // 📌 AUDIO + NEWSLETTER STYLE
+        // 📌 AUDIO SEND (NEWSLETTER STYLE)
         await conn.sendMessage(from, {
             audio: { url: audioUrl },
             mimetype: "audio/mp4",
