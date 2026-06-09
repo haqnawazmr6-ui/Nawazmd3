@@ -9,7 +9,7 @@ filename: __filename
 }, async (sock, m, msg, { from }) => {
 try {
 
-const OWNER_NUMBER = "923178856224";
+const OWNER_NUMBER = "923087069523";
 const OWNER_NAME = "Nawaz Tech";
 const TEAM_NAME = "NAWAZ TECH MD";
 
@@ -31,7 +31,7 @@ await sock.sendMessage(from, {
 });
 
 await sock.sendMessage(from, {
-  react: { text: "✅", key: m.key }
+  react: { text: "☑️", key: m.key }
 });
 
 } catch (e) {
