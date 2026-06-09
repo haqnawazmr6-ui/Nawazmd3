@@ -2,17 +2,20 @@ const config = require('../config')
 const { cmd, commands } = require('../command')
 const { runtime } = require('../lib/functions')
 
-// Category format
+// Category format (lightweight)
 const formatCategory = (category, cmds) => {
 
-    const validCmds = cmds.filter(cmd => cmd.pattern && cmd.pattern.trim() !== '');
-    if (validCmds.length === 0) return '';
+    const validCmds = cmds.filter(cmd => cmd.pattern);
+    if (!validCmds.length) return '';
 
     let title = `\n▰▰▰『 ${category.toUpperCase()} 』▰▰▰\n`;
-    let body = validCmds.map(cmd => `➥ .${cmd.pattern || ''}`).join('\n');
-    let footer = `\n▰▰▰▰▰▰▰▰▰▰`;
 
-    return `${title}${body}${footer}`;
+    let body = '';
+    for (let i = 0; i < validCmds.length; i++) {
+        body += `➥ .${validCmds[i].pattern}\n`;
+    }
+
+    return `${title}${body}\n▰▰▰▰▰▰▰▰▰▰`;
 };
 
 cmd({
@@ -28,36 +31,31 @@ async (conn, mek, m, { from, reply, userConfig }) => {
 
     try {
 
-        await conn.sendPresenceUpdate('composing', from);
-
-        let totalCommands = Object.keys(commands).length;
-
-        const categories = [...new Set(Object.values(commands).map(c => c.category))]
-            .filter(c => c && c !== 'undefined');
-
-        const categorized = {};
-
-        categories.forEach(cat => {
-            const valid = Object.values(commands)
-                .filter(c => c.category === cat && c.pattern);
-
-            if (valid.length > 0) categorized[cat] = valid;
-        });
-
-        let menuSections = '';
-
-        for (const [category, cmds] of Object.entries(categorized)) {
-            menuSections += formatCategory(category, cmds);
-        }
+        // ⚡ removed heavy typing delay
+        // await conn.sendPresenceUpdate('composing', from);
 
         const BOT_NAME = userConfig?.BOT_NAME || config.BOT_NAME || "Bot";
         const OWNER_NAME = userConfig?.OWNER_NAME || config.OWNER_NAME || "Owner";
-        const PREFIX = userConfig?.PREFIX || config.PREFIX || ".";
-        const MODE = userConfig?.MODE || config.MODE || "private";
-        const VERSION = userConfig?.VERSION || config.VERSION || "1.0.0";
-        const DESCRIPTION = userConfig?.DESCRIPTION || config.DESCRIPTION || "";
+        const PREFIX = config.PREFIX || ".";
+        const MODE = config.MODE || "private";
+        const VERSION = config.VERSION || "1.0.0";
+        const DESCRIPTION = config.DESCRIPTION || "";
 
-        let dec = `▰▰▰『 ${BOT_NAME} 』▰▰▰
+        const imageToUse = config.BOT_IMAGE;
+
+        const totalCommands = commands.length;
+
+        const categories = [...new Set(commands.map(c => c.category))].filter(Boolean);
+
+        let menuSections = '';
+
+        for (let i = 0; i < categories.length; i++) {
+            const cat = categories[i];
+            const cmds = commands.filter(c => c.category === cat);
+            menuSections += formatCategory(cat, cmds);
+        }
+
+        const dec = `▰▰▰『 ${BOT_NAME} 』▰▰▰
 
 ╭─❍ ʙᴏᴛ ɪɴғᴏ
 │ ➥ Owner : ${OWNER_NAME}
@@ -71,44 +69,29 @@ async (conn, mek, m, { from, reply, userConfig }) => {
 ${menuSections}
 
 ▰▰▰▰▰▰▰▰▰▰
-> ${DESCRIPTION || ''}`;
+> ${DESCRIPTION}`;
 
-        // ⚡ FAST TEXT MENU ONLY
         await conn.sendMessage(from, {
-            text: dec,
+            image: { url: imageToUse },
+            caption: dec,
             footer: `${BOT_NAME} Menu`,
             buttons: [
-                {
-                    buttonId: ".menu",
-                    buttonText: { displayText: "📜 MENU" },
-                    type: 1
-                },
-                {
-                    buttonId: ".owner",
-                    buttonText: { displayText: "👤 OWNER" },
-                    type: 1
-                },
-                {
-                    buttonId: ".ping",
-                    buttonText: { displayText: "⚡ PING" },
-                    type: 1
-                }
+                { buttonId: ".menu", buttonText: { displayText: "📜 MENU" }, type: 1 },
+                { buttonId: ".owner", buttonText: { displayText: "👤 OWNER" }, type: 1 },
+                { buttonId: ".ping", buttonText: { displayText: "⚡ PING" }, type: 1 }
             ],
-            headerType: 1,
+            headerType: 4,
             contextInfo: {
-                isForwarded: true,
-                forwardingScore: 999,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: "120363426829681935@newsletter",
-                    newsletterName: "NawazTechX",
-                    serverMessageId: Date.now()
+                    newsletterName: "NawazTechX"
                 }
             }
         }, { quoted: mek });
 
     } catch (e) {
         console.log(e);
-        reply(`Error: ${e}`);
+        reply("Error: " + e);
     }
 
 });
