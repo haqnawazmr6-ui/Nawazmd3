@@ -21,6 +21,7 @@ module.exports = async (m, sock, next) => {
       "mute",
       "unmute",
       "setpp",
+      "repeat 5, promote"'
       "setname",
       "setdesc",
       "group"
