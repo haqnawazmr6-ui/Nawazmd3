@@ -1,97 +1,93 @@
-const { cmd } = require('../command')
-const axios = require('axios')
-const yts = require('yt-search')
+const { cmd } = require("../command");
+const axios = require("axios");
 
-// ═══════════════════════════════════════════════════════════
-// 🎵 SONG COMMAND (SINGLE API - EliteProTech)
-// ═══════════════════════════════════════════════════════════
 cmd({
-    pattern: "song",
-    alias: ["play", "music", "audio", "aa"],
-    desc: "Download YouTube song",
-    category: "download",
-    react: "🥁",
+    pattern: "play",
+    desc: "YouTube music downloader",
+    category: "music",
+    react: "🎧",
     filename: __filename
-}, async (conn, mek, m, { from, reply, text }) => {
+},
+async (conn, mek, m, { from, args, reply }) => {
+
     try {
-        if (!text) {
-            return reply("❌ Please provide song name\nExample: .song Shape of You")
+
+        if (!args[0]) {
+            return reply("❌ Song name likho\nExample: .play faded");
         }
 
-        // 🔍 YouTube search
-        const search = await yts(text)
-        if (!search.videos || !search.videos.length) {
-            return reply("❌ No song found!")
+        let query = encodeURIComponent(args.join(" "));
+
+        let api = `https://api-xemoz-official.my.id/api/donwloader/ytplay.php?q=${query}`;
+
+        let { data } = await axios.get(api, { timeout: 15000 });
+
+        if (!data?.status) {
+            return reply("❌ Song not found");
         }
 
-        const vid = search.videos[0]
+        const result = data.result;
 
-        // 🎨 MODERN HACKER STYLE CAPTION
-        const caption = `
-╭─❍
-│ 🎵 ${vid.title}
-│
-│ 📀 Quality : 128kbps
-│ 📁 Format  : MP3
-│ ⚡ Status  : Downloading
-╰───────────────
+        if (!result?.download?.audio) {
+            return reply("❌ Audio not found");
+        }
 
-> Powered By NAWAZ-MD
-`
+        let title = result.title || "Unknown";
+        let channel = result.channel || "Unknown";
+        let duration = result.duration || "00:00";
+        let thumb = result.thumbnail;
+        let audioUrl = result.download.audio;
 
+        let text = `┏━━━━━━━━━━━━━━━━━━━━┓
+┃ ⚡ 𝗡𝗔𝗪𝗔𝗭 𝗠𝗗 ⚡
+┗━━━━━━━━━━━━━━━━━━━━┛
+
+🎧 SONG DETECTED
+
+❯ 🎶 ${title}
+❯ 👤 ${channel}
+❯ ⏱ ${duration}
+
+⬇️ Downloading...
+[■■■■■■■■■■] 100%
+
+🚀 Audio Ready
+━━━━━━━━━━━━━━━━`;
+
+        // 📌 IMAGE + NEWSLETTER STYLE
         await conn.sendMessage(from, {
-            image: { url: vid.thumbnail },
-            caption
-        }, { quoted: mek })
-
-        // API CALL
-        try {
-            const apiUrl = `https://api.azbry.com/api/download/ytmp3?url=${encodeURIComponent(vid.url)}`
-            const res = await axios.get(apiUrl, { timeout: 30000 })
-
-            if (!res.data?.status || !res.data?.result?.download) {
-                await conn.sendMessage(from, { react: { text: '❌', key: m.key } })
-                return reply("🕌 Only Islamic Audio Download Is Allowed")
+            image: { url: thumb },
+            caption: text,
+            contextInfo: {
+                isForwarded: true,
+                forwardingScore: 999,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: "120363426829681935@newsletter",
+                    newsletterName: "NawazTechX",
+                    serverMessageId: Date.now()
+                }
             }
+        }, { quoted: mek });
 
-            const audioUrl = res.data.result.download
-            const audioRes = await axios.get(audioUrl, {
-                responseType: 'arraybuffer',
-                timeout: 60000
-            })
-
-            const audioBuffer = Buffer.from(audioRes.data)
-
-            await conn.sendMessage(from, {
-                audio: audioBuffer,
-                mimetype: "audio/mpeg",
-                fileName: `${vid.title}.mp3`,
-                ptt: false
-            }, { quoted: mek })
-
-            await conn.sendMessage(from, {
-                react: { text: '✅', key: m.key }
-            })
-
-            console.log("✅ Song sent successfully!")
-
-        } catch (e) {
-            console.log("❌ API Failed:", e.message)
-
-            await conn.sendMessage(from, {
-                react: { text: '❌', key: m.key }
-            })
-
-            return reply("🕌 Only Islamic Audio Download Is Allowed")
-        }
-
-    } catch (err) {
-        console.error("❌ SONG ERROR:", err)
-
+        // 📌 AUDIO + NEWSLETTER STYLE
         await conn.sendMessage(from, {
-            react: { text: '❌', key: m.key }
-        })
+            audio: { url: audioUrl },
+            mimetype: "audio/mp4",
+            ptt: false,
+            contextInfo: {
+                isForwarded: true,
+                forwardingScore: 999,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: "120363426829681935@newsletter",
+                    newsletterName: "NawazTechX",
+                    serverMessageId: Date.now()
+                }
+            }
+        }, { quoted: mek });
 
-        reply("🕌 Only Islamic Audio Download Is Allowed")
+    } catch (e) {
+        console.log(e);
+        reply("❌ Error in play command");
     }
-})
+
+});
