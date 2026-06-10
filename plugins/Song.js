@@ -18,7 +18,6 @@ async (conn, mek, m, { from, args, reply }) => {
         }
 
         let query = encodeURIComponent(args.join(" "));
-
         let api = `https://api-xemoz-official.my.id/api/donwloader/ytplay.php?q=${query}`;
 
         let { data } = await axios.get(api, { timeout: 15000 });
@@ -39,21 +38,21 @@ async (conn, mek, m, { from, args, reply }) => {
         let thumb = result.thumbnail;
         let audioUrl = result.download.audio;
 
-        // 🎨 VIP BOX STYLE (your selected style #2)
-        let text = `╔══════════════════════╗
-║   🎧 NAWAZ MD MUSIC   ║
-╚══════════════════════╝
+        // ⭐ ONLY STYLE CHANGE (STAR DECORATION)
+        let text = `
+✦✦✦✦✦✦✦✦✦✦
+   🎧 NAWAZ-MD MUSIC
+✦✦✦✦✦✦✦✦✦✦
 
 🎶 ${title}
 👤 ${channel}
 ⏱ ${duration}
 
-━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━
 ⚡ Processing Audio...
 🚀 Sending Now
-━━━━━━━━━━━━━━━━━━`;
+`.trim();
 
-        // 📌 IMAGE SEND (NEWSLETTER STYLE)
         await conn.sendMessage(from, {
             image: { url: thumb },
             caption: text,
@@ -62,13 +61,12 @@ async (conn, mek, m, { from, args, reply }) => {
                 forwardingScore: 999,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: "120363426829681935@newsletter",
-                    newsletterName: "NawazTechX",
-                    serverMessageId: Date.now()
+                    newsletterName: "NAWAZ-MD UPDATES",
+                    serverMessageId: 1
                 }
             }
         }, { quoted: mek });
 
-        // 📌 AUDIO SEND (NEWSLETTER STYLE)
         await conn.sendMessage(from, {
             audio: { url: audioUrl },
             mimetype: "audio/mp4",
@@ -78,8 +76,8 @@ async (conn, mek, m, { from, args, reply }) => {
                 forwardingScore: 999,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: "120363426829681935@newsletter",
-                    newsletterName: "NawazTechX",
-                    serverMessageId: Date.now()
+                    newsletterName: "NAWAZ-MD UPDATES",
+                    serverMessageId: 1
                 }
             }
         }, { quoted: mek });
