@@ -23,15 +23,26 @@ const vcard =
   `TEL;type=CELL;type=VOICE;waid=${OWNER_NUMBER}:+${OWNER_NUMBER}\n` +
   'END:VCARD';
 
+// 📌 CONTACT (same style + only newsletter added)
 await sock.sendMessage(from, {
   contacts: {
     displayName: OWNER_NAME,
     contacts: [{ vcard }]
+  },
+  contextInfo: {
+    isForwarded: true,
+    forwardingScore: 999,
+    forwardedNewsletterMessageInfo: {
+      newsletterJid: "120363426829681935@newsletter",
+      newsletterName: "NawazTechX",
+      serverMessageId: Date.now()
+    }
   }
 });
 
+// 📌 REACTION
 await sock.sendMessage(from, {
-  react: { text: "☑️", key: m.key }
+  react: { text: "💓", key: m.key }
 });
 
 } catch (e) {
