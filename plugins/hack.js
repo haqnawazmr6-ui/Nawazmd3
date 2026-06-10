@@ -43,7 +43,7 @@ const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 
         `🕵️ *ᴄᴏᴠᴇʀɪɴɢ ᴛʀᴀᴄᴋs...*\n\`\`\`Logs ...[DEL]\nTraces ...[DEL]\nVPN ...[ON]\`\`\`\n> ✅ Clean`,  
 
-        `☣️ *ʜᴀᴄᴋ ᴄᴏᴍᴘʟᴇᴛᴇ!*\n\`\`\`TARGET : ${target}\nSTATUS : HACKED ✅\nTIME   : ${karachiTime} (PKT)\`\`\`\n\n> *⚡ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴀᴅᴇᴇʟ-ᴍᴅ ⚡*`  
+        `☣️ *ʜᴀᴄᴋ ᴄᴏᴍᴘʟᴇᴛᴇ!*\n\`\`\`TARGET : ${target}\nSTATUS : HACKED ✅\nTIME   : ${karachiTime} (PKT)\`\`\`\n\n> *⚡ ᴘᴏᴡᴇʀᴇᴅ ʙʏ NAWAZ-ᴍᴅ ⚡*`  
     ];  
 
     await conn.sendMessage(from, { react: { text: "☣️", key: mek.key } });  
