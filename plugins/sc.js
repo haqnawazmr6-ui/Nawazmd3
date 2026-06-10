@@ -9,22 +9,34 @@ cmd({
 },
 async (conn, mek, m, { from }) => {
 
-    const ownerNumber = "923087069523";
-    const serverLink = "https://nawazmd.vercel.app/";
+    const botLink = "https://nawazmd.vercel.app/";
 
     const message = `
-🤖 NAWAZ-MD INFO
+✦══════════════════════✦
+     📢 NAWAZ-MD NEWS
+✦══════════════════════✦
 
-👤 OWNER:
-${ownerNumber}
+🤖 BOT INFORMATION
 
-🌐 SERVER:
-${serverLink}
+🌐 BOT LINK:
+${botLink}
 
 ━━━━━━━━━━━━━━
-⚡ Power by Nawaz MD
-`;
 
-    await conn.sendMessage(from, { text: message }, { quoted: mek });
+⚡ Powered by Nawaz MD
+✦══════════════════════✦
+`.trim();
+
+    await conn.sendMessage(from, {
+        text: message,
+        contextInfo: {
+            isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+                newsletterJid: "120363426829681935@newsletter",
+                newsletterName: "NAWAZ-MD UPDATES",
+                serverMessageId: 1
+            }
+        }
+    }, { quoted: mek });
 
 });
