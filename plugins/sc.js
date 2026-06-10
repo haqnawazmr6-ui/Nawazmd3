@@ -12,19 +12,16 @@ async (conn, mek, m, { from }) => {
     const botLink = "https://nawazmd.vercel.app/";
 
     const message = `
-✦══════════════════════✦
-     📢 NAWAZ-MD NEWS
-✦══════════════════════✦
+✦✦✦✦✦✦✦✦✦✦
+   ⚙️ NAWAZ-MD SC
+✦✦✦✦✦✦✦✦✦✦
 
 🤖 BOT INFORMATION
 
 🌐 BOT LINK:
-${botLink}
+🔗 ${botLink}
 
-━━━━━━━━━━━━━━
-
-⚡ Powered by Nawaz MD
-✦══════════════════════✦
+⚡ Nawaz MD System
 `.trim();
 
     await conn.sendMessage(from, {
