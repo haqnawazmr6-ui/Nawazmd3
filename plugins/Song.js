@@ -61,7 +61,7 @@ async (conn, mek, m, { from, args, reply }) => {
                 forwardingScore: 999,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: "120363426829681935@newsletter",
-                    newsletterName: "NAWAZ-MD UPDATES",
+                    newsletterName: "NAWAZ-MD",
                     serverMessageId: 1
                 }
             }
@@ -76,7 +76,7 @@ async (conn, mek, m, { from, args, reply }) => {
                 forwardingScore: 999,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: "120363426829681935@newsletter",
-                    newsletterName: "NAWAZ-MD UPDATES",
+                    newsletterName: "NAWAZ-MD",
                     serverMessageId: 1
                 }
             }
