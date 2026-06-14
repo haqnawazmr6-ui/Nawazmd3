@@ -37,33 +37,21 @@ async (conn, mek, m, { from }) => {
 >> ACCESS GRANTED ✔
 `;
 
-        // 🖼️ IMAGE LINK ADDED
         const imageLink = "https://files.catbox.moe/an67z4.png";
 
-        // 1️⃣ ALIVE MESSAGE SEND
+        // ✅ SINGLE MESSAGE (IMAGE + TEXT TOGETHER)
         await conn.sendMessage(from, {
-            text: text,
+            image: { url: imageLink },
+            caption: text,
             contextInfo: {
                 isForwarded: true,
                 forwardingScore: 999,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: "120363426829681935@newsletter",
                     newsletterName: "NAWAZ TECH MD",
-                    serverMessageId: Date.now()
+                    serverMessageId: Date.now().toString()
                 }
             }
-        }, { quoted: mek });
-
-        // 2️⃣ IMAGE SEND
-        await conn.sendMessage(from, {
-            image: { url: imageLink },
-            caption: `
-╔════════════╗
-🖼️ LIVE IMAGE
-╚════════════╝
-
-🤖 NAWAZ TECH MD
-`,
         }, { quoted: mek });
 
     } catch (e) {
