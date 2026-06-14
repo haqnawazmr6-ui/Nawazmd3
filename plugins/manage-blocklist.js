@@ -10,7 +10,7 @@ cmd({
     filename: __filename
 },
 async (conn, m, { reply, q, react }) => {
-    // Get the bot owner's number dynamically
+
     const botOwner = conn.user.id.split(":")[0] + "@s.whatsapp.net";
     
     if (m.sender !== botOwner) {
@@ -19,15 +19,20 @@ async (conn, m, { reply, q, react }) => {
     }
 
     let jid;
+
     if (m.quoted) {
-        jid = m.quoted.sender; // If replying to a message, get sender JID
-    } else if (m.mentionedJid.length > 0) {
-        jid = m.mentionedJid[0]; // If mentioning a user, get their JID
-    } else if (q && q.includes("@")) {
-        jid = q.replace(/[@\s]/g, '') + "@s.whatsapp.net"; // If manually typing a JID
-    } else {
+        jid = m.quoted.sender;
+    } 
+    else if (m.mentionedJid && m.mentionedJid.length > 0) {
+        jid = m.mentionedJid[0];
+    } 
+    else if (q) {
+        let num = q.replace(/[^0-9]/g, '');
+        jid = num + "@s.whatsapp.net";
+    } 
+    else {
         await react("❌");
-        return reply("Please mention a user or reply to their message.");
+        return reply("Please mention, reply or enter a number.");
     }
 
     try {
@@ -49,7 +54,7 @@ cmd({
     filename: __filename
 },
 async (conn, m, { reply, q, react }) => {
-    // Get the bot owner's number dynamically
+
     const botOwner = conn.user.id.split(":")[0] + "@s.whatsapp.net";
 
     if (m.sender !== botOwner) {
@@ -58,15 +63,20 @@ async (conn, m, { reply, q, react }) => {
     }
 
     let jid;
+
     if (m.quoted) {
         jid = m.quoted.sender;
-    } else if (m.mentionedJid.length > 0) {
+    } 
+    else if (m.mentionedJid && m.mentionedJid.length > 0) {
         jid = m.mentionedJid[0];
-    } else if (q && q.includes("@")) {
-        jid = q.replace(/[@\s]/g, '') + "@s.whatsapp.net";
-    } else {
+    } 
+    else if (q) {
+        let num = q.replace(/[^0-9]/g, '');
+        jid = num + "@s.whatsapp.net";
+    } 
+    else {
         await react("❌");
-        return reply("Please mention a user or reply to their message.");
+        return reply("Please mention, reply or enter a number.");
     }
 
     try {
@@ -78,4 +88,4 @@ async (conn, m, { reply, q, react }) => {
         await react("❌");
         reply("Failed to unblock the user.");
     }
-});           
+});
