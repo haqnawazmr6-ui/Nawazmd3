@@ -3,7 +3,7 @@ const { cmd } = require('../command');
 cmd({
     pattern: "alive",
     alias: ["status", "runtime"],
-    desc: "Alive message with video",
+    desc: "Alive message with image",
     category: "main",
     react: "⚡",
     filename: __filename
@@ -17,7 +17,6 @@ async (conn, mek, m, { from }) => {
         const mnt = Math.floor((uptime % 3600) / 60);
         const sec = Math.floor(uptime % 60);
 
-        // 🔥 ALIVE TEXT (HACKER STYLE)
         let text = `
 [ SYSTEM STATUS // LIVE ]
 
@@ -38,12 +37,12 @@ async (conn, mek, m, { from }) => {
 >> ACCESS GRANTED ✔
 `;
 
-        // 🎥 VIDEO LINK (YAHAN APNA LINK DAALNA HAI)
-        const videoLink = "https://your-video-link.mp4";
+        // 🖼️ DP IMAGE LINK
+        const imageUrl = "https://files.catbox.moe/an67z4.png";
 
-        // 1️⃣ ALIVE MESSAGE SEND
         await conn.sendMessage(from, {
-            text: text,
+            image: { url: imageUrl },
+            caption: text,
             contextInfo: {
                 isForwarded: true,
                 forwardingScore: 999,
@@ -55,21 +54,11 @@ async (conn, mek, m, { from }) => {
             }
         }, { quoted: mek });
 
-        // 2️⃣ VIDEO AUTO SEND AFTER ALIVE
-        await conn.sendMessage(from, {
-            video: { url: videoLink },
-            caption: `
-╔════════════╗
-🎥 LIVE VIDEO
-╚════════════╝
-
-🤖 NAWAZ TECH MD
-`,
-        }, { quoted: mek });
-
     } catch (e) {
         console.log(e);
-        conn.sendMessage(from, { text: "❌ Error in alive command" });
+        await conn.sendMessage(from, {
+            text: "❌ Error in alive command"
+        }, { quoted: mek });
     }
 
-});
+});```
