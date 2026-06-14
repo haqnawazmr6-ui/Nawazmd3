@@ -1,5 +1,3 @@
-// Nawaz 
-
 const { cmd } = require('../command');
 
 cmd({
@@ -9,13 +7,12 @@ cmd({
     react: "🚫",
     filename: __filename
 },
-async (conn, m, { reply, q, react }) => {
+async (conn, m, { q }) => {
 
     const botOwner = conn.user.id.split(":")[0] + "@s.whatsapp.net";
-    
+
     if (m.sender !== botOwner) {
-        await react("❌");
-        return reply("Only the bot owner can use this command.");
+        return conn.sendMessage(m.chat, { text: "Only the bot owner can use this command." }, { quoted: m });
     }
 
     let jid;
@@ -31,21 +28,24 @@ async (conn, m, { reply, q, react }) => {
         jid = num + "@s.whatsapp.net";
     } 
     else {
-        await react("❌");
-        return reply("Please mention, reply or enter a number.");
+        return conn.sendMessage(m.chat, { text: "Please mention, reply or enter a number." }, { quoted: m });
     }
 
     try {
         await conn.updateBlockStatus(jid, "block");
-        await react("✅");
-        reply(`Successfully blocked @${jid.split("@")[0]}`, { mentions: [jid] });
+        return conn.sendMessage(
+            m.chat,
+            { text: `Successfully blocked @${jid.split("@")[0]}`, mentions: [jid] },
+            { quoted: m }
+        );
     } catch (error) {
-        console.error("Block command error:", error);
-        await react("❌");
-        reply("Failed to block the user.");
+        console.log(error);
+        return conn.sendMessage(m.chat, { text: "Failed to block user." }, { quoted: m });
     }
 });
 
+
+// UNBLOCK
 cmd({
     pattern: "unblock",
     desc: "Unblocks a person",
@@ -53,13 +53,12 @@ cmd({
     react: "🔓",
     filename: __filename
 },
-async (conn, m, { reply, q, react }) => {
+async (conn, m, { q }) => {
 
     const botOwner = conn.user.id.split(":")[0] + "@s.whatsapp.net";
 
     if (m.sender !== botOwner) {
-        await react("❌");
-        return reply("Only the bot owner can use this command.");
+        return conn.sendMessage(m.chat, { text: "Only the bot owner can use this command." }, { quoted: m });
     }
 
     let jid;
@@ -75,17 +74,18 @@ async (conn, m, { reply, q, react }) => {
         jid = num + "@s.whatsapp.net";
     } 
     else {
-        await react("❌");
-        return reply("Please mention, reply or enter a number.");
+        return conn.sendMessage(m.chat, { text: "Please mention, reply or enter a number." }, { quoted: m });
     }
 
     try {
         await conn.updateBlockStatus(jid, "unblock");
-        await react("✅");
-        reply(`Successfully unblocked @${jid.split("@")[0]}`, { mentions: [jid] });
+        return conn.sendMessage(
+            m.chat,
+            { text: `Successfully unblocked @${jid.split("@")[0]}`, mentions: [jid] },
+            { quoted: m }
+        );
     } catch (error) {
-        console.error("Unblock command error:", error);
-        await react("❌");
-        reply("Failed to unblock the user.");
+        console.log(error);
+        return conn.sendMessage(m.chat, { text: "Failed to unblock user." }, { quoted: m });
     }
 });
