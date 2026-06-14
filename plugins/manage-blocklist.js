@@ -3,7 +3,7 @@ const { cmd } = require('../command');
 // 🔒 BLOCK COMMAND
 cmd({
     pattern: "block",
-    desc: "Block any number (global)",
+    desc: "Block any number",
     category: "owner",
     react: "🚫",
     filename: __filename
@@ -12,9 +12,9 @@ async (conn, m, { q }) => {
 
     try {
 
-        const botOwner = conn.user.id.split(":")[0] + "@s.whatsapp.net";
+        const owner = conn.user.id.split(":")[0] + "@s.whatsapp.net";
 
-        if (m.sender !== botOwner) {
+        if (m.sender !== owner) {
             return conn.sendMessage(m.chat, {
                 text: "❌ Only owner can use this command."
             }, { quoted: m });
@@ -29,16 +29,17 @@ async (conn, m, { q }) => {
         let num = q.replace(/[^0-9]/g, '');
         let jid = num + "@s.whatsapp.net";
 
+        // ✅ BLOCK USER
         await conn.updateBlockStatus(jid, "block");
 
         return conn.sendMessage(m.chat, {
-            text: `🚫 Number Blocked Successfully\n📵 ${num}`
+            text: `🚫 Blocked Successfully\n📵 ${num}`
         }, { quoted: m });
 
     } catch (e) {
-        console.log(e);
+        console.log("BLOCK ERROR:", e);
         conn.sendMessage(m.chat, {
-            text: "❌ Error while blocking number"
+            text: "❌ Block failed"
         }, { quoted: m });
     }
 
@@ -48,7 +49,7 @@ async (conn, m, { q }) => {
 // 🔓 UNBLOCK COMMAND
 cmd({
     pattern: "unblock",
-    desc: "Unblock any number (global)",
+    desc: "Unblock any number",
     category: "owner",
     react: "🔓",
     filename: __filename
@@ -57,9 +58,9 @@ async (conn, m, { q }) => {
 
     try {
 
-        const botOwner = conn.user.id.split(":")[0] + "@s.whatsapp.net";
+        const owner = conn.user.id.split(":")[0] + "@s.whatsapp.net";
 
-        if (m.sender !== botOwner) {
+        if (m.sender !== owner) {
             return conn.sendMessage(m.chat, {
                 text: "❌ Only owner can use this command."
             }, { quoted: m });
@@ -74,16 +75,17 @@ async (conn, m, { q }) => {
         let num = q.replace(/[^0-9]/g, '');
         let jid = num + "@s.whatsapp.net";
 
+        // ✅ UNBLOCK USER
         await conn.updateBlockStatus(jid, "unblock");
 
         return conn.sendMessage(m.chat, {
-            text: `🔓 Number Unblocked Successfully\n📲 ${num}`
+            text: `🔓 Unblocked Successfully\n📲 ${num}`
         }, { quoted: m });
 
     } catch (e) {
-        console.log(e);
+        console.log("UNBLOCK ERROR:", e);
         conn.sendMessage(m.chat, {
-            text: "❌ Error while unblocking number"
+            text: "❌ Unblock failed"
         }, { quoted: m });
     }
 
