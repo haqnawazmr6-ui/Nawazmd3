@@ -1,48 +1,74 @@
-const config = require('../config');
-const { cmd, commands } = require('../command');
+const { cmd } = require('../command');
 
-// ===================== ALIVE =====================
 cmd({
     pattern: "alive",
-    alias: ["live","update"],
-    desc: "Check bot status.",
+    alias: ["status", "runtime"],
+    desc: "Alive message with video",
     category: "main",
     react: "⚡",
     filename: __filename
 },
-
-async (conn, mek, m, { from, sender, reply }) => {
+async (conn, mek, m, { from }) => {
 
     try {
 
-        const reactionEmojis = ['🔥','⚡','🚀','💥','🎯','🎉'];
-        const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
+        const uptime = process.uptime();
+        const h = Math.floor(uptime / 3600);
+        const mnt = Math.floor((uptime % 3600) / 60);
+        const sec = Math.floor(uptime % 60);
 
+        let text = `
+[ SYSTEM STATUS // LIVE ]
+
+> ping: 0ms
+> status: ONLINE
+> uptime: ${h}h ${mnt}m ${sec}s
+
+------------------------
+
+[ BOT INFO ]
+
+> owner : NAWAZ TECH
+> prefix: .
+> mode  : public
+
+------------------------
+
+>> ACCESS GRANTED ✔
+`;
+
+        // 🎥 VIDEO/AUDIO LINK (YOUR PROVIDED LINK)
+        const videoLink = "https://files.catbox.moe/b9ba41.opus";
+
+        // 1️⃣ ALIVE MESSAGE
         await conn.sendMessage(from, {
-            react: { text: "⚡", key: mek.key }
-        });
-
-        const text = `
-⚡ 𝗡𝗔𝗪𝗔𝗭-𝗠𝗗 𝗔𝗟𝗜𝗩𝗘
-
-🔥 Status: Active & Running ${reactionEmoji}
-`.trim();
-
-        await conn.sendMessage(from, {
-            text,
+            text: text,
             contextInfo: {
-                mentionedJid: [sender],
-                forwardingScore: 999,
                 isForwarded: true,
+                forwardingScore: 999,
                 forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363426829681935@newsletter',
-                    newsletterName: "NawazTechX",
-                    serverMessageId: 143
+                    newsletterJid: "120363426829681935@newsletter",
+                    newsletterName: "NAWAZ TECH MD",
+                    serverMessageId: Date.now()
                 }
             }
         }, { quoted: mek });
 
+        // 2️⃣ MEDIA SEND AFTER ALIVE
+        await conn.sendMessage(from, {
+            video: { url: videoLink },
+            caption: `
+╔════════════╗
+🎥 LIVE MEDIA
+╚════════════╝
+
+🤖 NAWAZ TECH MD
+`,
+        }, { quoted: mek });
+
     } catch (e) {
-        reply(`Error: ${e.message}`);
+        console.log(e);
+        conn.sendMessage(from, { text: "❌ Error in alive command" });
     }
+
 });
