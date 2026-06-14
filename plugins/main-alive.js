@@ -3,7 +3,7 @@ const { cmd } = require('../command');
 cmd({
     pattern: "alive",
     alias: ["status", "runtime"],
-    desc: "Alive message with image",
+    desc: "Alive message with video",
     category: "main",
     react: "⚡",
     filename: __filename
@@ -37,12 +37,12 @@ async (conn, mek, m, { from }) => {
 >> ACCESS GRANTED ✔
 `;
 
-        // 🖼️ DP IMAGE LINK
-        const imageUrl = "https://files.catbox.moe/an67z4.png";
+        // 🖼️ IMAGE LINK ADDED
+        const imageLink = "https://files.catbox.moe/an67z4.png";
 
+        // 1️⃣ ALIVE MESSAGE SEND
         await conn.sendMessage(from, {
-            image: { url: imageUrl },
-            caption: text,
+            text: text,
             contextInfo: {
                 isForwarded: true,
                 forwardingScore: 999,
@@ -54,11 +54,21 @@ async (conn, mek, m, { from }) => {
             }
         }, { quoted: mek });
 
+        // 2️⃣ IMAGE SEND
+        await conn.sendMessage(from, {
+            image: { url: imageLink },
+            caption: `
+╔════════════╗
+🖼️ LIVE IMAGE
+╚════════════╝
+
+🤖 NAWAZ TECH MD
+`,
+        }, { quoted: mek });
+
     } catch (e) {
         console.log(e);
-        await conn.sendMessage(from, {
-            text: "❌ Error in alive command"
-        }, { quoted: mek });
+        conn.sendMessage(from, { text: "❌ Error in alive command" });
     }
 
-});```
+});
