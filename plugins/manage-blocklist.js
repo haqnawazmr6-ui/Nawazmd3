@@ -1,92 +1,87 @@
 const { cmd } = require('../command');
 
-// 🔒 BLOCK COMMAND
 cmd({
     pattern: "block",
-    desc: "Block any number",
+    desc: "Block replied/mentioned user",
     category: "owner",
     react: "🚫",
     filename: __filename
 },
-async (conn, m, { q }) => {
+async (conn, m) => {
 
-    try {
+    const owner = conn.user.id.split(":")[0] + "@s.whatsapp.net";
 
-        const owner = conn.user.id.split(":")[0] + "@s.whatsapp.net";
-
-        if (m.sender !== owner) {
-            return conn.sendMessage(m.chat, {
-                text: "❌ Only owner can use this command."
-            }, { quoted: m });
-        }
-
-        if (!q) {
-            return conn.sendMessage(m.chat, {
-                text: "❌ Usage: block 923xxxxxxxxx"
-            }, { quoted: m });
-        }
-
-        let num = q.replace(/[^0-9]/g, '');
-        let jid = num + "@s.whatsapp.net";
-
-        // ✅ BLOCK USER
-        await conn.updateBlockStatus(jid, "block");
-
-        return conn.sendMessage(m.chat, {
-            text: `🚫 Blocked Successfully\n📵 ${num}`
-        }, { quoted: m });
-
-    } catch (e) {
-        console.log("BLOCK ERROR:", e);
-        conn.sendMessage(m.chat, {
-            text: "❌ Block failed"
-        }, { quoted: m });
+    if (m.sender !== owner) {
+        return m.reply("❌ Only owner can use this command.");
     }
 
+    let jid;
+
+    if (m.quoted) {
+        jid = m.quoted.sender;
+    } else if (m.mentionedJid && m.mentionedJid.length > 0) {
+        jid = m.mentionedJid[0];
+    } else {
+        return m.reply("❌ Reply or mention a user.");
+    }
+
+    try {
+        await conn.updateBlockStatus(jid, "block");
+
+        await conn.sendMessage(
+            m.chat,
+            {
+                text: `🚫 Successfully Blocked @${jid.split("@")[0]}`,
+                mentions: [jid]
+            },
+            { quoted: m }
+        );
+
+    } catch (e) {
+        console.log(e);
+        m.reply("❌ Failed to block user.");
+    }
 });
 
-
-// 🔓 UNBLOCK COMMAND
 cmd({
     pattern: "unblock",
-    desc: "Unblock any number",
+    desc: "Unblock replied/mentioned user",
     category: "owner",
     react: "🔓",
     filename: __filename
 },
-async (conn, m, { q }) => {
+async (conn, m) => {
 
-    try {
+    const owner = conn.user.id.split(":")[0] + "@s.whatsapp.net";
 
-        const owner = conn.user.id.split(":")[0] + "@s.whatsapp.net";
-
-        if (m.sender !== owner) {
-            return conn.sendMessage(m.chat, {
-                text: "❌ Only owner can use this command."
-            }, { quoted: m });
-        }
-
-        if (!q) {
-            return conn.sendMessage(m.chat, {
-                text: "❌ Usage: unblock 923xxxxxxxxx"
-            }, { quoted: m });
-        }
-
-        let num = q.replace(/[^0-9]/g, '');
-        let jid = num + "@s.whatsapp.net";
-
-        // ✅ UNBLOCK USER
-        await conn.updateBlockStatus(jid, "unblock");
-
-        return conn.sendMessage(m.chat, {
-            text: `🔓 Unblocked Successfully\n📲 ${num}`
-        }, { quoted: m });
-
-    } catch (e) {
-        console.log("UNBLOCK ERROR:", e);
-        conn.sendMessage(m.chat, {
-            text: "❌ Unblock failed"
-        }, { quoted: m });
+    if (m.sender !== owner) {
+        return m.reply("❌ Only owner can use this command.");
     }
 
+    let jid;
+
+    if (m.quoted) {
+        jid = m.quoted.sender;
+    } else if (m.mentionedJid && m.mentionedJid.length > 0) {
+        jid = m.mentionedJid[0];
+    } else {
+        return m.reply("❌ Reply or mention a user.");
+    }
+
+    try {
+        await conn.updateBlockStatus(jid, "unblock");
+
+        await conn.sendMessage(
+            m.chat,
+            {
+                text: `🔓 Successfully Unblocked @${jid.split("@")[0]}`,
+                mentions: [jid]
+            },
+            { quoted: m }
+        );
+
+    } catch (e) {
+        console.log(e);
+        m.reply("❌ Failed to unblock user.");
+    }
 });
