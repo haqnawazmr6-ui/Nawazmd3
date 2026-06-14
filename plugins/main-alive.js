@@ -17,6 +17,7 @@ async (conn, mek, m, { from }) => {
         const mnt = Math.floor((uptime % 3600) / 60);
         const sec = Math.floor(uptime % 60);
 
+        // 🔥 ALIVE TEXT (HACKER STYLE)
         let text = `
 [ SYSTEM STATUS // LIVE ]
 
@@ -37,12 +38,12 @@ async (conn, mek, m, { from }) => {
 >> ACCESS GRANTED ✔
 `;
 
-        const imageUrl = "https://files.catbox.moe/an67z4.png";
-        const videoLink = "https://files.catbox.moe/b9ba41.opus";
+        // 🎥 VIDEO LINK (YAHAN APNA LINK DAALNA HAI)
+        const videoLink = "https://your-video-link.mp4";
 
+        // 1️⃣ ALIVE MESSAGE SEND
         await conn.sendMessage(from, {
-            image: { url: imageUrl },
-            caption: text,
+            text: text,
             contextInfo: {
                 isForwarded: true,
                 forwardingScore: 999,
@@ -54,21 +55,21 @@ async (conn, mek, m, { from }) => {
             }
         }, { quoted: mek });
 
+        // 2️⃣ VIDEO AUTO SEND AFTER ALIVE
         await conn.sendMessage(from, {
             video: { url: videoLink },
-            gifPlayback: true,
             caption: `
 ╔════════════╗
 🎥 LIVE VIDEO
 ╚════════════╝
 
 🤖 NAWAZ TECH MD
-`
+`,
         }, { quoted: mek });
 
     } catch (e) {
         console.log(e);
-        await conn.sendMessage(from, { text: "❌ Error in alive command" }, { quoted: mek });
+        conn.sendMessage(from, { text: "❌ Error in alive command" });
     }
 
-});```
+});
