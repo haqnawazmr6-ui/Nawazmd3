@@ -1,36 +1,12 @@
 const { cmd } = require('../command');
 
-// enabled chats storage
-const reactionEnabledChats = new Map();
-
-// YOUR EMOJI LIST
+// ONLY YOUR PROVIDED EMOJIS
 const REACTIONS = [
-    "💟","🧡","💛","💚","💙","🤎","🖤","🤍",
+    "💟","🧡","💛","💚","💙","🤎","🤎","🖤","🤍",
     "💔","💗","💕","❤️","❣️"
 ];
 
-// TOGGLE COMMAND
-cmd({
-    pattern: "autoreact",
-    desc: "Enable/Disable auto reaction system",
-    category: "owner",
-    react: "💟",
-    filename: __filename
-},
-async (conn, m, msg, { from, reply }) => {
-
-    const current = reactionEnabledChats.get(from) || false;
-    reactionEnabledChats.set(from, !current);
-
-    if (!current) {
-        reply("💟 Auto Reaction ENABLED");
-    } else {
-        reply("❌ Auto Reaction DISABLED");
-    }
-});
-
-
-// AUTO REACTION ENGINE
+// AUTO REACTION (ALWAYS ON)
 cmd({
     on: "messages.upsert",
     filename: __filename
@@ -44,15 +20,13 @@ async (conn, data) => {
 
         const chat = msg.key.remoteJid;
 
-        // check if enabled
-        if (!reactionEnabledChats.get(chat)) return;
-
         // ignore bot messages
         if (msg.key.fromMe) return;
 
+        // ignore status
         if (chat === "status@broadcast") return;
 
-        // pick random emoji
+        // pick from ONLY given list
         const emoji = REACTIONS[Math.floor(Math.random() * REACTIONS.length)];
 
         await conn.sendMessage(chat, {
