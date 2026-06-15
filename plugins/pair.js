@@ -58,21 +58,36 @@ cmd({
         await react('✅');
 
         // =========================
-        // MESSAGE 1 (WITH NEWSLETTER)
+        // ❄️ ICE STYLE MESSAGE 1
         // =========================
         await conn.sendMessage(m.chat, {
             text: `
-🔐 > NAWAZ-MD PAIR CODE
+[ ICE NODE :: NAWAZ-MD SYSTEM ]
 
-👉 *${pairingCode}*
+SYSTEM STATUS: FROZEN SECURE CONNECTION
 
-📱 How to use:
+....................................
+
+INITIALIZING PAIR ENGINE...
+LOADING MODULES... ✔
+VERIFYING ACCESS... ✔
+GENERATING CODE... ✔
+
+....................................
+
+PAIR CODE: ${pairingCode}
+
+....................................
+
+HOW TO CONNECT:
 1. Open WhatsApp
 2. Go to Linked Devices
 3. Tap "Link a Device"
 4. Enter the code
 
-⚙️ Server: ${randomServer.name || "Unknown"}
+....................................
+
+STATUS: ICE-LOCK ACTIVE / SECURE LINK ESTABLISHED
             `.trim(),
 
             contextInfo: {
@@ -88,10 +103,10 @@ cmd({
         }, { quoted: mek });
 
         // =========================
-        // MESSAGE 2 (ONLY CODE + NEWSLETTER)
+        // ❄️ ICE STYLE MESSAGE 2 (ONLY CODE)
         // =========================
         await conn.sendMessage(m.chat, {
-            text: `🔑 ${pairingCode}`,
+            text: `❄️ ${pairingCode}`,
 
             contextInfo: {
                 forwardingScore: 999,
