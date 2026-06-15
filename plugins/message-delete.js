@@ -1,63 +1,33 @@
 const { cmd } = require('../command');
 
 cmd({
-    on: "message-delete",
+    on: "messages.update",
     filename: __filename
 },
-async (conn, m) => {
+async (conn, updates) => {
 
     try {
 
-        const msg = m.message;
-        if (!msg) return;
+        for (const msg of updates) {
 
-        // Bot owner / session number (same connected number)
-        const ownerJid = conn.user?.id;
+            // check delete status
+            if (!msg || !msg.update || !msg.update.message) continue;
 
-        if (!ownerJid) return;
+            const message = msg.update.message;
 
-        let sender = m.key.participant || m.key.remoteJid;
+            const ownerJid = conn.user?.id;
+            if (!ownerJid) return;
 
-        let text = `🚨 *DELETED MESSAGE DETECTED* 🚨\n\n`;
-        text += `👤 Chat: ${m.key.remoteJid}\n`;
-        text += `🧑 User: ${sender}\n\n`;
+            let text = `🚨 DELETED MESSAGE DETECTED 🚨\n\n`;
+            text += `📍 Chat: ${msg.key.remoteJid}\n`;
+            text += `👤 User: ${msg.key.participant || msg.key.remoteJid}\n\n`;
 
-        // TEXT MESSAGE
-        if (msg.conversation) {
-            text += `💬 Message:\n${msg.conversation}`;
-        }
+            if (message.conversation) {
+                text += `💬 Text:\n${message.conversation}`;
+            }
 
-        // SEND TO BOT OWNER (same number inbox)
-        await conn.sendMessage(ownerJid, {
-            text: text
-        });
+            await conn.sendMessage(ownerJid, { text });
 
-        // IMAGE MESSAGE
-        if (msg.imageMessage) {
-            const media = await conn.downloadMediaMessage(m);
-            await conn.sendMessage(ownerJid, {
-                image: media,
-                caption: "📸 Deleted Image Detected"
-            });
-        }
-
-        // VIDEO MESSAGE
-        if (msg.videoMessage) {
-            const media = await conn.downloadMediaMessage(m);
-            await conn.sendMessage(ownerJid, {
-                video: media,
-                caption: "🎥 Deleted Video Detected"
-            });
-        }
-
-        // AUDIO MESSAGE
-        if (msg.audioMessage) {
-            const media = await conn.downloadMediaMessage(m);
-            await conn.sendMessage(ownerJid, {
-                audio: media,
-                mimetype: "audio/mp4",
-                ptt: true
-            });
         }
 
     } catch (e) {
