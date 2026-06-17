@@ -6,6 +6,19 @@ function random(min, max) {
 
 const emojis = ["🔥","💖","👑","💎","😎","😈","😇","🖤","⚡","💥"];
 
+// 🎁 MULTIPLE GIFT STICKERS (add your own .webp files here)
+const giftStickers = [
+    "./stickers/gift1.webp",
+    "./stickers/gift2.webp",
+    "./stickers/gift3.webp",
+    "./stickers/gift4.webp",
+    "./stickers/gift5.webp"
+];
+
+function randomSticker() {
+    return giftStickers[Math.floor(Math.random() * giftStickers.length)];
+}
+
 function getEmoji(role) {
     if (["girl","queen","princess"].includes(role)) return "💖";
     if (["king","boss","vip"].includes(role)) return "👑";
@@ -18,20 +31,14 @@ function getEmoji(role) {
 
 function build(role, emoji, percent, user) {
     return `
-${emoji} ${role.toUpperCase()} FIRE RESULT ${emoji}
+🎁 ${emoji} ${role.toUpperCase()} GIFT RESULT 🎁
 
-╭──────────────╮
-   NAWAZ MD SYSTEM
-╰──────────────╯
+👤 User: @${(user || "").split('@')[0]}
 
-👤 User : @${user.split('@')[0]}
+⚡ Power: ${percent}%
+🔥 Status: EXTREME FIRE
 
-⚡ Power : ${percent}%
-🔥 Level : EXTREME FIRE
-
-━━━━━━━━━━━━━━
-👑 NAWAZ MD
-━━━━━━━━━━━━━━
+🎉 You received a random gift 🎉
 `;
 }
 
@@ -46,7 +53,7 @@ roles.forEach((role) => {
 cmd({
     pattern: role,
     category: "fun",
-    react: "🔥",
+    react: "🎁",
     filename: __filename
 },
 async (conn, mek, m, { from }) => {
@@ -55,22 +62,26 @@ async (conn, mek, m, { from }) => {
 
         const user = m.sender;
         const percent = random(60, 100);
-
         const emoji = getEmoji(role);
 
         const text = build(role, emoji, percent, user);
 
+        // 📩 text message
         await conn.sendMessage(from, {
             text,
-            mentions: [user],
-            contextInfo: {
-                isForwarded: true,
-                forwardingScore: 999,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: "120363426829681935@newsletter",
-                    newsletterName: "NAWAZ MD",
-                    serverMessageId: Date.now()
-                }
+            mentions: [user]
+        });
+
+        // 🎁 RANDOM STICKER (EVERY TIME DIFFERENT)
+        await conn.sendMessage(from, {
+            sticker: { url: randomSticker() }
+        });
+
+        // 🔥 reaction
+        await conn.sendMessage(from, {
+            react: {
+                text: "🎁",
+                key: m.key
             }
         });
 
