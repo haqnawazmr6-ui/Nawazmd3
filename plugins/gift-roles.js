@@ -6,17 +6,17 @@ function random(min, max) {
 
 const emojis = ["🔥","💖","👑","💎","😎","😈","😇","🖤","⚡","💥"];
 
-// 🎁 MULTIPLE GIFT STICKERS (add your own .webp files here)
-const giftStickers = [
-    "./stickers/gift1.webp",
-    "./stickers/gift2.webp",
-    "./stickers/gift3.webp",
-    "./stickers/gift4.webp",
-    "./stickers/gift5.webp"
+// 🎬 LOCAL GIF VIDEOS (NO LINKS)
+const giftVideos = [
+    "./gifs/gift1.mp4",
+    "./gifs/gift2.mp4",
+    "./gifs/gift3.mp4",
+    "./gifs/gift4.mp4",
+    "./gifs/gift5.mp4"
 ];
 
-function randomSticker() {
-    return giftStickers[Math.floor(Math.random() * giftStickers.length)];
+function randomVideo() {
+    return giftVideos[Math.floor(Math.random() * giftVideos.length)];
 }
 
 function getEmoji(role) {
@@ -38,7 +38,7 @@ function build(role, emoji, percent, user) {
 ⚡ Power: ${percent}%
 🔥 Status: EXTREME FIRE
 
-🎉 You received a random gift 🎉
+🎉 Enjoy your offline gift 🎉
 `;
 }
 
@@ -66,15 +66,17 @@ async (conn, mek, m, { from }) => {
 
         const text = build(role, emoji, percent, user);
 
-        // 📩 text message
+        // 📩 TEXT
         await conn.sendMessage(from, {
             text,
             mentions: [user]
         });
 
-        // 🎁 RANDOM STICKER (EVERY TIME DIFFERENT)
+        // 🎬 OFFLINE VIDEO GIF STYLE
         await conn.sendMessage(from, {
-            sticker: { url: randomSticker() }
+            video: { url: randomVideo() },
+            gifPlayback: true,
+            caption: "🎁 Your Offline Gift is Ready!"
         });
 
         // 🔥 reaction
