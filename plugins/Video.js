@@ -1,7 +1,5 @@
 //---------------------------------------------------------------------------
-//           U NAME - YOUTUBE VIDEO DOWNLOADER (AUTO-DL)
-//---------------------------------------------------------------------------
-//  🚀 SEARCH AND DOWNLOAD VIDEOS AUTOMATICALLY
+//           NAWAZ MD - YOUTUBE VIDEO DOWNLOADER (FIXED)
 //---------------------------------------------------------------------------
 
 const { cmd } = require("../command");
@@ -12,7 +10,7 @@ const axios = require("axios");
 const cache = new Map();
 
 /**
- * Normalizes YouTube URLs to a standard format
+ * Normalize YouTube URL
  */
 function normalizeYouTubeUrl(url) {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/.*[?&]v=)([a-zA-Z0-9_-]{11})/);
@@ -20,7 +18,7 @@ function normalizeYouTubeUrl(url) {
 }
 
 /**
- * Core Data Fetching Logic using Jawad-Tech API
+ * Get Download Link API
  */
 async function fetchDownloadData(url, retries = 2) {
   try {
@@ -34,97 +32,105 @@ async function fetchDownloadData(url, retries = 2) {
         title: data.result.title || "YouTube Video",
       };
     }
-    throw new Error("API failed to return download link.");
-  } catch (error) {
+
+    throw new Error("API failed");
+  } catch (e) {
     if (retries > 0) {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise(r => setTimeout(r, 2000));
       return fetchDownloadData(url, retries - 1);
     }
     return null;
   }
 }
 
-// --- MAIN COMMAND: VIDEO ---
-
+// MAIN COMMAND
 cmd(
   {
     pattern: "video",
     alias: ["ytmp4", "vdl"],
     react: "🎥",
-    desc: "Search and download high-quality videos from YouTube.",
+    desc: "YouTube Video Downloader",
     category: "download",
     filename: __filename,
   },
   async (conn, mek, m, { from, q, reply, prefix, command }) => {
     try {
-      if (!q) return reply(`🎥 *Video Downloader*\n\nUsage: \`${prefix + command} <name or link>\`\nExample: \`${prefix + command} perfect ed sheeran\``);
+
+      if (!q) {
+        return reply(`🎥 *Usage:* ${prefix + command} video name or link`);
+      }
 
       await conn.sendMessage(from, { react: { text: "🔍", key: mek.key } });
 
-      // Step 1: Search for the video
+      // SEARCH
       const url = normalizeYouTubeUrl(q);
       let ytdata;
 
       if (url) {
-        const searchResults = await yts({ videoId: q.split('v=')[1]?.split('&')[0] || q.split('/').pop() });
-        ytdata = searchResults;
+        const searchResults = await yts(url);
+        ytdata = searchResults.videos?.[0];
       } else {
         const searchResults = await yts(q);
-        if (!searchResults.videos.length) return reply("❌ No videos found for your query!");
+        if (!searchResults.videos.length) {
+          return reply("❌ No video found!");
+        }
         ytdata = searchResults.videos[0];
       }
 
-      // Step 2: Send info message
+      // INFO MESSAGE
       const infoText = `
-🎥 *YT VIDEO DOWNLOADER* 🎥
+🎥 *YT VIDEO DOWNLOADER*
 
-📌 *Title:* ${ytdata.title}
-🎬 *Channel:* ${ytdata.author?.name || 'Unknown'}
-⏱️ *Duration:* ${ytdata.timestamp}
-👁️ *Views:* ${ytdata.views.toLocaleString()}
+📌 Title: ${ytdata.title}
+🎬 Channel: ${ytdata.author?.name || "Unknown"}
+⏱ Duration: ${ytdata.timestamp}
+👁 Views: ${ytdata.views.toLocaleString()}
 
-_📥 Processing your video file, please wait..._
+📥 Downloading please wait...
 
-> © ᴘᴏᴡᴇʀᴇᴅ ʙʏ NAWAZ-MD`;
+🚀 Powered by Nawaz MD
+`;
 
-      await conn.sendMessage(from, { image: { url: ytdata.thumbnail || ytdata.image }, caption: infoText }, { quoted: mek });
+      await conn.sendMessage(from, {
+        image: { url: ytdata.thumbnail || ytdata.image },
+        caption: infoText
+      }, { quoted: mek });
+
       await conn.sendMessage(from, { react: { text: "⏳", key: mek.key } });
 
-      // Step 3: Fetch download link from API
+      // GET DOWNLOAD LINK
       const dlData = await fetchDownloadData(ytdata.url);
 
       if (!dlData || !dlData.video_url) {
-        await conn.sendMessage(from, { react: { text: "❌", key: mek.key } });
-        return reply("❌ Download link could not be generated. Please try again later.");
+        return reply("❌ Video link not found or expired!");
       }
 
-      // Step 4: Send the Video file
-      await conn.sendMessage(
-        from,
-        {
-          video: { url: dlData.video_url },
+      // =========================
+      // FIXED VIDEO SEND METHOD
+      // =========================
+      try {
+        const videoBuffer = await axios.get(dlData.video_url, {
+          responseType: "arraybuffer",
+          timeout: 60000
+        });
+
+        await conn.sendMessage(from, {
+          video: Buffer.from(videoBuffer.data),
           mimetype: "video/mp4",
-          caption: `✅ *${dlData.title}*\n\n*🚀 Powered by NAWAZMD*`,
-          contextInfo: {
-            externalAdReply: {
-              title: "YT VIDEO DOWNLOADER",
-              body: dlData.title,
-              thumbnailUrl: ytdata.thumbnail || ytdata.image,
-              sourceUrl: ytdata.url,
-              mediaType: 2,
-              renderLargerThumbnail: false
-            }
-          }
-        },
-        { quoted: mek }
-      );
+          caption: `✅ *${dlData.title}*\n\n🚀 Powered by Nawaz MD`
+        }, { quoted: mek });
+
+      } catch (err) {
+        console.log("VIDEO SEND ERROR:", err.message);
+        return reply("❌ Video send failed (invalid link or large file).");
+      }
 
       await conn.sendMessage(from, { react: { text: "✅", key: mek.key } });
 
     } catch (e) {
-      console.error("Video DL Error:", e);
+      console.log("ERROR:", e);
       await conn.sendMessage(from, { react: { text: "❌", key: mek.key } });
-      reply(`⚠️ *Error:* ${e.message || "Something went wrong."}`);
+      reply("⚠️ Something went wrong!");
     }
   }
 );
