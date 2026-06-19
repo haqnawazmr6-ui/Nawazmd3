@@ -1,7 +1,7 @@
 const { cmd } = require('../command');
 
 cmd({
-    pattern: "allgroupforward",
+    pattern: "all",
     desc: "Forward replied message to all groups (safe broadcast)",
     category: "owner",
     react: "📢",
