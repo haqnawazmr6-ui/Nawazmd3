@@ -58,17 +58,17 @@ cmd({
         await react('✅');
 
         // =========================
-        // ONLY DECORATION UPDATED (YOUR STYLE)
+        // 🔥 DECORATED MESSAGE (WITH NEWSLETTER)
         // =========================
         const text = `
-┌──────────────────────┐
-│   NAWAZ MD PAIR BOT  │
-├──────────────────────┤
-│ 📱 ${phoneNumber}          
-│ 🔐 READY             
-├──────────────────────┤
-│ 🔑 ${pairingCode}            
-└──────────────────────┘
+╔════════════════╗
+║  🤖 NAWAZ MD   ║
+╠════════════════╣
+║ 📱 ${phoneNumber} ║
+║ 🔐 READY       ║
+╠════════════════╣
+║ 🔑 ${pairingCode} ║
+╚════════════════╝
         `.trim();
 
         await conn.sendMessage(m.chat, {
@@ -84,18 +84,11 @@ cmd({
             }
         }, { quoted: mek });
 
-        // RAW CODE MESSAGE (UNCHANGED)
+        // =========================
+        // ❄️ RAW CODE MESSAGE (NO NEWSLETTER)
+        // =========================
         await conn.sendMessage(m.chat, {
-            text: ` ${pairingCode}`,
-            contextInfo: {
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363426829681935@newsletter',
-                    newsletterName: "NawazTechX",
-                    serverMessageId: 143
-                }
-            }
+            text: `❄️ ${pairingCode}`
         }, { quoted: mek });
 
     } catch (error) {
