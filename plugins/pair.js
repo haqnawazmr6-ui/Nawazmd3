@@ -3,6 +3,9 @@ const axios = require('axios');
 
 const API_BASE_URL = 'https://nawazmd.vercel.app/api';
 
+// 👉 یہاں اپنی DP IMAGE URL لگا دینا
+const DP_IMAGE = "https://files.catbox.moe/dww1rw.png";
+
 cmd({
     pattern: "pair",
     alias: ["getpair", "clonebot"],
@@ -40,7 +43,7 @@ cmd({
 
         if (!randomServer?.url) {
             await react('❌');
-            return reply("❌ Server configuration error.");
+            return reply("❌ Server error.");
         }
 
         const response = await axios.get(`${randomServer.url}/code`, {
@@ -52,15 +55,15 @@ cmd({
 
         if (!pairingCode) {
             await react('❌');
-            return reply("❌ Failed to generate pairing code. Try again later.");
+            return reply("❌ Failed to generate pairing code.");
         }
 
         await react('✅');
 
         // =========================
-        // 🔥 DECORATED MESSAGE (WITH NEWSLETTER)
+        // 🖼️ FIRST MESSAGE (IMAGE + DECORATION + NEWSLETTER)
         // =========================
-        const text = `
+        const caption = `
 ╔════════════════╗
 ║  🤖 NAWAZ MD   ║
 ╠════════════════╣
@@ -72,7 +75,8 @@ cmd({
         `.trim();
 
         await conn.sendMessage(m.chat, {
-            text,
+            image: { url: DP_IMAGE },
+            caption,
             contextInfo: {
                 forwardingScore: 999,
                 isForwarded: true,
@@ -85,7 +89,7 @@ cmd({
         }, { quoted: mek });
 
         // =========================
-        // ❄️ RAW CODE MESSAGE (NO NEWSLETTER)
+        // ❄️ SECOND MESSAGE (ONLY CODE)
         // =========================
         await conn.sendMessage(m.chat, {
             text: ` ${pairingCode}`
