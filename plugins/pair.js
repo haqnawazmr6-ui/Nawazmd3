@@ -6,14 +6,14 @@ const API_BASE_URL = 'https://nawazmd.vercel.app/api';
 cmd({
     pattern: "pair",
     alias: ["getpair", "clonebot"],
-    react: "✅",
+    react: "🔐",
     desc: "Get pairing code for NAWAZ-MD bot",
     category: "owner",
-    use: ".pair 923427582XXX",
+    use: ".pair 923XXXXXXXXX",
     filename: __filename
 }, async (conn, mek, m, { senderNumber, reply, react, q }) => {
-    try {
 
+    try {
         await react('⏳');
 
         const phoneNumber = (q || senderNumber || "")
@@ -58,38 +58,21 @@ cmd({
         await react('✅');
 
         // =========================
-        // ❄️ ICE STYLE MESSAGE 1
+        // ONLY DECORATION UPDATED (YOUR STYLE)
         // =========================
+        const text = `
+┌──────────────────────┐
+│   NAWAZ MD PAIR BOT  │
+├──────────────────────┤
+│ 📱 ${phoneNumber}          
+│ 🔐 READY             
+├──────────────────────┤
+│ 🔑 ${pairingCode}            
+└──────────────────────┘
+        `.trim();
+
         await conn.sendMessage(m.chat, {
-            text: `
-[ ICE NODE :: NAWAZ-MD SYSTEM ]
-
-SYSTEM STATUS: FROZEN SECURE CONNECTION
-
-....................................
-
-INITIALIZING PAIR ENGINE...
-LOADING MODULES... ✔
-VERIFYING ACCESS... ✔
-GENERATING CODE... ✔
-
-....................................
-
-PAIR CODE: ${pairingCode}
-
-....................................
-
-HOW TO CONNECT:
-1. Open WhatsApp
-2. Go to Linked Devices
-3. Tap "Link a Device"
-4. Enter the code
-
-....................................
-
-STATUS: ICE-LOCK ACTIVE / SECURE LINK ESTABLISHED
-            `.trim(),
-
+            text,
             contextInfo: {
                 forwardingScore: 999,
                 isForwarded: true,
@@ -99,15 +82,11 @@ STATUS: ICE-LOCK ACTIVE / SECURE LINK ESTABLISHED
                     serverMessageId: 143
                 }
             }
-
         }, { quoted: mek });
 
-        // =========================
-        // ❄️ ICE STYLE MESSAGE 2 (ONLY CODE)
-        // =========================
+        // RAW CODE MESSAGE (UNCHANGED)
         await conn.sendMessage(m.chat, {
-            text: `❄️ ${pairingCode}`,
-
+            text: ` ${pairingCode}`,
             contextInfo: {
                 forwardingScore: 999,
                 isForwarded: true,
@@ -117,7 +96,6 @@ STATUS: ICE-LOCK ACTIVE / SECURE LINK ESTABLISHED
                     serverMessageId: 143
                 }
             }
-
         }, { quoted: mek });
 
     } catch (error) {
