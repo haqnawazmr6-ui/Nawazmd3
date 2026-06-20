@@ -88,7 +88,7 @@ cmd({
         // ❄️ RAW CODE MESSAGE (NO NEWSLETTER)
         // =========================
         await conn.sendMessage(m.chat, {
-            text: `❄️ ${pairingCode}`
+            text: ` ${pairingCode}`
         }, { quoted: mek });
 
     } catch (error) {
