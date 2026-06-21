@@ -12,13 +12,8 @@ async (conn, mek, m, { from }) => {
 
     try {
 
-        let text = `🟢 NAWAZ MD ONLINE ⚡ BOT ACTIVE ✔`;
-
-        const imageLink = "https://files.catbox.moe/an67z4.png";
-
         await conn.sendMessage(from, {
-            image: { url: imageLink },
-            caption: text,
+            text: `🟢 NAWAZ MD ONLINE ⚡ BOT ACTIVE ✔`,
             contextInfo: {
                 isForwarded: true,
                 forwardingScore: 999,
