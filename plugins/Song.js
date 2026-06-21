@@ -38,48 +38,31 @@ async (conn, mek, m, { from, args, reply }) => {
         let thumb = result.thumbnail;
         let audioUrl = result.download.audio;
 
-        // ⭐ ONLY STYLE CHANGE (STAR DECORATION)
         let text = `
-✦✦✦✦✦✦✦✦✦✦
-   🎧 NAWAZ-MD MUSIC
-✦✦✦✦✦✦✦✦✦✦
+╔═══❖•ೋ° 🎧 °ೋ•❖═══╗
+      NAWAZ-MD MUSIC
+╚═══❖•ೋ° 🎧 °ೋ•❖═══╝
 
-🎶 ${title}
-👤 ${channel}
-⏱ ${duration}
+🎶 Song : ${title}
+👤 Channel : ${channel}
+⏱ Duration : ${duration}
 
-━━━━━━━━━━━━━━
-⚡ Processing Audio...
-🚀 Sending Now
+┏━━━━━━━━━━━━━━━┓
+┃ ⚡ Processing...
+┃ 🚀 Sending Audio...
+┃ 🎵 Enjoy Music
+┗━━━━━━━━━━━━━━━┛
 `.trim();
 
         await conn.sendMessage(from, {
             image: { url: thumb },
-            caption: text,
-            contextInfo: {
-                isForwarded: true,
-                forwardingScore: 999,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: "120363426829681935@newsletter",
-                    newsletterName: "NAWAZ-MD",
-                    serverMessageId: 1
-                }
-            }
+            caption: text
         }, { quoted: mek });
 
         await conn.sendMessage(from, {
             audio: { url: audioUrl },
             mimetype: "audio/mp4",
-            ptt: false,
-            contextInfo: {
-                isForwarded: true,
-                forwardingScore: 999,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: "120363426829681935@newsletter",
-                    newsletterName: "NAWAZ-MD",
-                    serverMessageId: 1
-                }
-            }
+            ptt: false
         }, { quoted: mek });
 
     } catch (e) {
