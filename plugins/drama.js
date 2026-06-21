@@ -1,54 +1,157 @@
-const { cmd } = require('../command');
-const axios = require('axios');
+//---------------------------------------------------------------------------
+//           NAWAZ MD - YOUTUBE VIDEO DOWNLOADER (FIXED)
+//---------------------------------------------------------------------------
 
-cmd({
-    pattern: "drama",
-    alias: ["ytvideo", "video"],
-    desc: "YouTube video downloader",
-    category: "download",
-    react: "📥",
-    filename: __filename
-},
-async (conn, mek, m, { from, q, reply }) => {
+const { cmd } = require("../command");
+const yts = require("yt-search");
+const axios = require("axios");
 
-    try {
+// Simple In-memory cache
+const cache = new Map();
 
-        if (!q) {
-            return reply("❌ Please send YouTube link\n\nExample:\n.ytv https://youtu.be/dQw4w9WgXcQ");
-        }
+/**
+ * Normalize YouTube URL
+ */
+function normalizeYouTubeUrl(url) {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/.*[?&]v=)([a-zA-Z0-9_-]{11})/);
+  return match ? `https://youtube.com/watch?v=${match[1]}` : null;
+}
 
-        await conn.sendMessage(from, { react: { text: "⏳", key: m.key } });
+/**
+ * Get Download Link API
+ */
+async function fetchDownloadData(url, retries = 2) {
+  try {
+    const apiUrl = `https://jawad-tech.vercel.app/download/ytdl?url=${encodeURIComponent(url)}`;
+    const response = await axios.get(apiUrl, { timeout: 20000 });
+    const data = response.data;
 
-        const api = `https://apis.prexzyvilla.site/download/youtube-video?url=${encodeURIComponent(q.trim())}`;
-
-        const { data } = await axios.get(api);
-
-        console.log("YT API RESPONSE:", data);
-
-        if (!data || data.status === false) {
-            return reply("❌ Video not found or API error");
-        }
-
-        const videoUrl =
-            data.url ||
-            data.result?.url ||
-            data.download_url ||
-            data.video;
-
-        if (!videoUrl) {
-            return reply("❌ Download link not found in API response");
-        }
-
-        await conn.sendMessage(from, {
-            video: { url: videoUrl },
-            caption: `╔════════════╗\n📥 YOUTUBE VIDEO DOWNLOADER\n╚════════════╝\n\n🤖 NAWAZ TECH MD`,
-        }, { quoted: mek });
-
-        await conn.sendMessage(from, { react: { text: "✅", key: m.key } });
-
-    } catch (e) {
-        console.log(e);
-        reply("❌ Error downloading video");
+    if (data.status === true && data.result) {
+      return {
+        video_url: data.result.mp4,
+        title: data.result.title || "YouTube Video",
+      };
     }
 
-});
+    throw new Error("API failed");
+  } catch (e) {
+    if (retries > 0) {
+      await new Promise(r => setTimeout(r, 2000));
+      return fetchDownloadData(url, retries - 1);
+    }
+    return null;
+  }
+}
+
+// MAIN COMMAND
+cmd(
+  {
+    pattern: "drama",
+    alias: ["ytmp4", "vdl"],
+    react: "🎥",
+    desc: "YouTube Video Downloader",
+    category: "download",
+    filename: __filename,
+  },
+  async (conn, mek, m, { from, args, q, reply, prefix, command }) => {
+    try {
+
+      if (!q) {
+        return reply(`🎥 *Usage:* ${prefix + command} video name or link`);
+      }
+
+      await conn.sendMessage(from, { react: { text: "🔍", key: mek.key } });
+
+      // SEARCH
+      const url = normalizeYouTubeUrl(q);
+      let ytdata;
+
+      if (url) {
+        const searchResults = await yts(q);
+        ytdata = searchResults.videos?.[0];
+      } else {
+        const searchResults = await yts(q);
+        if (!searchResults.videos.length) {
+          return reply("❌ No video found!");
+        }
+        ytdata = searchResults.videos[0];
+      }
+
+      // ⚡🌑 DARK NEON STYLE MESSAGE (ONLY CHANGED PART)
+      const infoText = `
+╔════════════════════╗
+   ⚡🌑 *YOUTUBE DOWNLOADER* 🌑⚡
+╚════════════════════╝
+
+┏━━━━━━━━━━━━━━━━━━┓
+┃ 🎬 *TITLE*
+┣━━━━━━━━━━━━━━━━━━┫
+┃ ${ytdata.title}
+┗━━━━━━━━━━━━━━━━━━┛
+
+┏━━━━━━━━━━━━━━━━━━┓
+┃ 🎥 *CHANNEL*
+┣━━━━━━━━━━━━━━━━━━┫
+┃ ${ytdata.author?.name || "Unknown"}
+┗━━━━━━━━━━━━━━━━━━┛
+
+┏━━━━━━━━━━━━━━━━━━┓
+┃ ⏱ *DURATION*
+┣━━━━━━━━━━━━━━━━━━┫
+┃ ${ytdata.timestamp}
+┗━━━━━━━━━━━━━━━━━━┛
+
+┏━━━━━━━━━━━━━━━━━━┓
+┃ 👁 *VIEWS*
+┣━━━━━━━━━━━━━━━━━━┫
+┃ ${ytdata.views.toLocaleString()}
+┗━━━━━━━━━━━━━━━━━━┛
+
+⚡━━━━━━━━━━━━━━━━━━⚡
+   ⬇️ *DOWNLOADING...*
+⚡━━━━━━━━━━━━━━━━━━⚡
+
+🌑 *Powered by Nawaz MD*
+`;
+
+      await conn.sendMessage(from, {
+        image: { url: ytdata.thumbnail || ytdata.image },
+        caption: infoText
+      }, { quoted: mek });
+
+      await conn.sendMessage(from, { react: { text: "⏳", key: mek.key } });
+
+      // GET DOWNLOAD LINK
+      const dlData = await fetchDownloadData(ytdata.url);
+
+      if (!dlData || !dlData.video_url) {
+        return reply("❌ Video link not found or expired!");
+      }
+
+      // SEND VIDEO
+      try {
+        const videoBuffer = await axios.get(dlData.video_url, {
+          responseType: "arraybuffer",
+          timeout: 60000
+        });
+
+        await conn.sendMessage(from, {
+          video: Buffer.from(videoBuffer.data),
+          mimetype: "video/mp4",
+          caption: `✅ *${dlData.title}*\n\n🌑 Powered by Nawaz MD`
+        }, { quoted: mek });
+
+      } catch (err) {
+        console.log("VIDEO SEND ERROR:", err.message);
+        return reply("❌ Video send failed (invalid link or large file).");
+      }
+
+      await conn.sendMessage(from, { react: { text: "✅", key: mek.key } });
+
+    } catch (e) {
+      console.log("ERROR:", e);
+      await conn.sendMessage(from, { react: { text: "❌", key: mek.key } });
+      reply("⚠️ Something went wrong!");
+    }
+  }
+);
