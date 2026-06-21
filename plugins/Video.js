@@ -53,7 +53,7 @@ cmd(
     category: "download",
     filename: __filename,
   },
-  async (conn, mek, m, { from, q, reply, prefix, command }) => {
+  async (conn, mek, m, { from, args, q, reply, prefix, command }) => {
     try {
 
       if (!q) {
@@ -67,7 +67,7 @@ cmd(
       let ytdata;
 
       if (url) {
-        const searchResults = await yts(url);
+        const searchResults = await yts(q);
         ytdata = searchResults.videos?.[0];
       } else {
         const searchResults = await yts(q);
@@ -77,18 +77,41 @@ cmd(
         ytdata = searchResults.videos[0];
       }
 
-      // INFO MESSAGE
+      // ⚡🌑 DARK NEON STYLE MESSAGE (ONLY CHANGED PART)
       const infoText = `
-🎥 *YT VIDEO DOWNLOADER*
+╔════════════════════╗
+   ⚡🌑 *YOUTUBE DOWNLOADER* 🌑⚡
+╚════════════════════╝
 
-📌 Title: ${ytdata.title}
-🎬 Channel: ${ytdata.author?.name || "Unknown"}
-⏱ Duration: ${ytdata.timestamp}
-👁 Views: ${ytdata.views.toLocaleString()}
+┏━━━━━━━━━━━━━━━━━━┓
+┃ 🎬 *TITLE*
+┣━━━━━━━━━━━━━━━━━━┫
+┃ ${ytdata.title}
+┗━━━━━━━━━━━━━━━━━━┛
 
-📥 Downloading please wait...
+┏━━━━━━━━━━━━━━━━━━┓
+┃ 🎥 *CHANNEL*
+┣━━━━━━━━━━━━━━━━━━┫
+┃ ${ytdata.author?.name || "Unknown"}
+┗━━━━━━━━━━━━━━━━━━┛
 
-🚀 Powered by Nawaz MD
+┏━━━━━━━━━━━━━━━━━━┓
+┃ ⏱ *DURATION*
+┣━━━━━━━━━━━━━━━━━━┫
+┃ ${ytdata.timestamp}
+┗━━━━━━━━━━━━━━━━━━┛
+
+┏━━━━━━━━━━━━━━━━━━┓
+┃ 👁 *VIEWS*
+┣━━━━━━━━━━━━━━━━━━┫
+┃ ${ytdata.views.toLocaleString()}
+┗━━━━━━━━━━━━━━━━━━┛
+
+⚡━━━━━━━━━━━━━━━━━━⚡
+   ⬇️ *DOWNLOADING...*
+⚡━━━━━━━━━━━━━━━━━━⚡
+
+🌑 *Powered by Nawaz MD*
 `;
 
       await conn.sendMessage(from, {
@@ -105,9 +128,7 @@ cmd(
         return reply("❌ Video link not found or expired!");
       }
 
-      // =========================
-      // FIXED VIDEO SEND METHOD
-      // =========================
+      // SEND VIDEO
       try {
         const videoBuffer = await axios.get(dlData.video_url, {
           responseType: "arraybuffer",
@@ -117,7 +138,7 @@ cmd(
         await conn.sendMessage(from, {
           video: Buffer.from(videoBuffer.data),
           mimetype: "video/mp4",
-          caption: `✅ *${dlData.title}*\n\n🚀 Powered by Nawaz MD`
+          caption: `✅ *${dlData.title}*\n\n🌑 Powered by Nawaz MD`
         }, { quoted: mek });
 
       } catch (err) {
