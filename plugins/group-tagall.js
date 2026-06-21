@@ -13,13 +13,14 @@ cmd({
 },
 async (conn, mek, m, { from, participants, reply, isGroup, isAdmins, isCreator, prefix, command, args, body }) => {
     try {
+
         // ✅ Group check
         if (!isGroup) {
             await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
             return reply("❌ This command can only be used in groups.");
         }
 
-        // ✅ Permission check (Admin OR Bot Owner)
+        // ✅ Permission check
         if (!isAdmins && !isCreator) {
             await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
             return reply("❌ Only group admins or the bot owner can use this command.");
@@ -40,8 +41,22 @@ async (conn, mek, m, { from, participants, reply, isGroup, isAdmins, isCreator, 
         let message = body.slice(body.indexOf(command) + command.length).trim();
         if (!message) message = "Attention Everyone";
 
-        let teks = `▢ Group : *${groupName}*\n▢ Members : *${totalMembers}*\n▢ Message: *${message}*\n\n┌───⊷ *MENTIONS*\n`;
+        // ⚡ SELECTED STYLE (ONLY UI CHANGED)
+        let teks = `
+╔══════════════════╗
+   ⚡ > NAWAZ ⚡
+╚══════════════════╝
 
+👥 GROUP: ${groupName}
+👤 USERS: ${totalMembers}
+📩 MSG : ${message}
+
+⚡────────────────⚡
+   🔊 MENTIONS
+⚡────────────────⚡
+`;
+
+        // ✅ Mentions
         for (let mem of participants) {
             if (!mem.id) continue;
             teks += `${randomEmoji} @${mem.id.split('@')[0]}\n`;
@@ -49,7 +64,10 @@ async (conn, mek, m, { from, participants, reply, isGroup, isAdmins, isCreator, 
 
         teks += "└──✪ NAWAZ ┃ MD ✪──";
 
-        conn.sendMessage(from, { text: teks, mentions: participants.map(a => a.id) }, { quoted: mek });
+        conn.sendMessage(from, {
+            text: teks,
+            mentions: participants.map(a => a.id)
+        }, { quoted: mek });
 
     } catch (e) {
         console.error("TagAll Error:", e);
