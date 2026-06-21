@@ -53,7 +53,7 @@ cmd(
     category: "download",
     filename: __filename,
   },
-  async (conn, mek, m, { from, args, q, reply, prefix, command }) => {
+  async (conn, mek, m, { from, q, reply, prefix, command }) => {
     try {
 
       if (!q) {
@@ -77,41 +77,24 @@ cmd(
         ytdata = searchResults.videos[0];
       }
 
-      // ⚡🌑 DARK NEON STYLE MESSAGE (ONLY CHANGED PART)
+      // ✅ CLEAN PRO DECORATION STYLE (UPDATED ONLY)
       const infoText = `
-╔════════════════════╗
-   ⚡🌑 *YOUTUBE DOWNLOADER* 🌑⚡
-╚════════════════════╝
+╭───────────────🎥
+│  *YOUTUBE DOWNLOADER*
+╰───────────────
 
-┏━━━━━━━━━━━━━━━━━━┓
-┃ 🎬 *TITLE*
-┣━━━━━━━━━━━━━━━━━━┫
-┃ ${ytdata.title}
-┗━━━━━━━━━━━━━━━━━━┛
+🎬 *Title:* ${ytdata.title}
 
-┏━━━━━━━━━━━━━━━━━━┓
-┃ 🎥 *CHANNEL*
-┣━━━━━━━━━━━━━━━━━━┫
-┃ ${ytdata.author?.name || "Unknown"}
-┗━━━━━━━━━━━━━━━━━━┛
+🎥 *Channel:* ${ytdata.author?.name || "Unknown"}
 
-┏━━━━━━━━━━━━━━━━━━┓
-┃ ⏱ *DURATION*
-┣━━━━━━━━━━━━━━━━━━┫
-┃ ${ytdata.timestamp}
-┗━━━━━━━━━━━━━━━━━━┛
+⏱ *Duration:* ${ytdata.timestamp}
 
-┏━━━━━━━━━━━━━━━━━━┓
-┃ 👁 *VIEWS*
-┣━━━━━━━━━━━━━━━━━━┫
-┃ ${ytdata.views.toLocaleString()}
-┗━━━━━━━━━━━━━━━━━━┛
+👁 *Views:* ${ytdata.views.toLocaleString()}
 
-⚡━━━━━━━━━━━━━━━━━━⚡
-   ⬇️ *DOWNLOADING...*
-⚡━━━━━━━━━━━━━━━━━━⚡
+────────────────────
+⬇️ Downloading please wait...
 
-🌑 *Powered by Nawaz MD*
+🚀 Powered by Nawaz MD
 `;
 
       await conn.sendMessage(from, {
@@ -138,7 +121,7 @@ cmd(
         await conn.sendMessage(from, {
           video: Buffer.from(videoBuffer.data),
           mimetype: "video/mp4",
-          caption: `✅ *${dlData.title}*\n\n🌑 Powered by Nawaz MD`
+          caption: `✅ *${dlData.title}*\n\n🚀 Powered by Nawaz MD`
         }, { quoted: mek });
 
       } catch (err) {
