@@ -44,7 +44,7 @@ async (conn, mek, m, { from, participants, reply, isGroup, isAdmins, isCreator, 
         // ⚡ SELECTED STYLE (ONLY UI CHANGED)
         let teks = `
 ╔══════════════════╗
-   ⚡ > NAWAZ ⚡
+   ⚡NAWAZ-MD⚡
 ╚══════════════════╝
 
 👥 GROUP: ${groupName}
