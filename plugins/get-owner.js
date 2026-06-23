@@ -42,7 +42,7 @@ await sock.sendMessage(from, {
 
 // 📌 REACTION
 await sock.sendMessage(from, {
-  react: { text: "💓", key: m.key }
+  react: { text: "☠️", key: m.key }
 });
 
 } catch (e) {
