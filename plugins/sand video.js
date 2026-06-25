@@ -5,6 +5,7 @@ cmd({
     desc: "Send custom video",
     category: "media",
     react: "🎬",
+    dontAddCommandList: true,
     filename: __filename
 },
 async (conn, mek, m, { reply }) => {
