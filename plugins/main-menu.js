@@ -22,19 +22,17 @@ const formatCategory = (category, cmds) => {
 
 
 cmd({
-pattern: "menu",
-alias: ["m","help","allmenu","fullmenu"],
-use: ".menu",
-desc: "Show all bot commands",
-category: "main",
-react: "🖥️",
-filename: __filename
+    pattern: "menu",
+    alias: ["m","help","allmenu","fullmenu"],
+    use: ".menu",
+    desc: "Show all bot commands",
+    category: "main",
+    react: "🖥️",
+    filename: __filename
 
 },
 
-
 async (conn, mek, m, { from, reply, userConfig }) => {
-
 
 try {
 
@@ -46,23 +44,24 @@ const MODE = config.MODE || "private";
 const VERSION = config.VERSION || "1.0.0";
 const DESCRIPTION = config.DESCRIPTION || "";
 
+
 const imageToUse = config.BOT_IMAGE;
 
 
-// 🎵 MUSIC LINK HERE
-const MUSIC_URL = "https://files.catbox.moe/uql9w6";
+// 🎵 PUT YOUR MP3 LINK HERE
+
+const SONG_URL = "https://files.catbox.moe/uql9w6";
 
 
 
 const totalCommands = commands.length;
 
 
-
 const grouped = {};
 
 for (let i = 0; i < commands.length; i++) {
 
-let c = commands[i];
+const c = commands[i];
 
 if(!c.category) continue;
 
@@ -72,7 +71,6 @@ grouped[c.category] = [];
 grouped[c.category].push(c);
 
 }
-
 
 
 const categories = Object.keys(grouped);
@@ -110,10 +108,10 @@ ${menuSections}
 
 
 
-// MENU SEND
+
+// MENU (NEWSLETTER STYLE)
 
 await conn.sendMessage(from, {
-
 
 image:{
 url:imageToUse
@@ -123,7 +121,6 @@ caption:dec,
 
 
 footer:`${BOT_NAME} Menu`,
-
 
 
 buttons:[
@@ -136,7 +133,6 @@ displayText:"📜 MENU"
 type:1
 },
 
-
 {
 buttonId:".owner",
 buttonText:{
@@ -145,7 +141,6 @@ displayText:"👤 OWNER"
 type:1
 },
 
-
 {
 buttonId:".ping",
 buttonText:{
@@ -153,7 +148,6 @@ displayText:"⚡ PING"
 },
 type:1
 }
-
 
 ],
 
@@ -164,7 +158,6 @@ contextInfo:{
 isForwarded:true,
 
 forwardingScore:999,
-
 
 forwardedNewsletterMessageInfo:{
 
@@ -184,8 +177,7 @@ serverMessageId:Date.now()
 
 
 
-
-// ⏳ 2 SECOND WAIT
+// 2 SECOND DELAY
 
 await new Promise(resolve=>setTimeout(resolve,2000));
 
@@ -193,46 +185,21 @@ await new Promise(resolve=>setTimeout(resolve,2000));
 
 
 
-// 🎵 MUSIC SEND
+// 🎵 NORMAL SONG STYLE AUDIO
 
-await conn.sendMessage(from,{
+await conn.sendMessage(from, {
 
 
 audio:{
-url:MUSIC_URL
+url:SONG_URL
 },
 
 
 mimetype:"audio/mpeg",
 
 
-// MUSIC STYLE
-ptt:true,
-
-
-
-contextInfo:{
-
-
-isForwarded:true,
-
-forwardingScore:999,
-
-
-forwardedNewsletterMessageInfo:{
-
-
-newsletterJid:"120363426829681935@newsletter",
-
-newsletterName:"NawazTechX",
-
-serverMessageId:Date.now()
-
-
-}
-
-
-}
+// IMPORTANT
+ptt:false
 
 
 },{quoted:mek});
@@ -247,6 +214,5 @@ console.log(e);
 reply("Error : "+e);
 
 }
-
 
 });
