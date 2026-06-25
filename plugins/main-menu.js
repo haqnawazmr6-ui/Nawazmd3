@@ -6,6 +6,7 @@ const { runtime } = require('../lib/functions')
 const formatCategory = (category, cmds) => {
 
     const validCmds = cmds.filter(cmd => cmd.pattern);
+
     if (!validCmds.length) return '';
 
     let title = `\n▰▰▰『 ${category.toUpperCase()} 』▰▰▰\n`;
@@ -22,55 +23,64 @@ const formatCategory = (category, cmds) => {
 
 
 cmd({
-    pattern: "menu",
-    alias: ["m","help","allmenu","fullmenu"],
-    use: ".menu",
-    desc: "Show all bot commands",
-    category: "main",
-    react: "🖥️",
-    filename: __filename
+
+pattern: "menu",
+alias: ["m","help","allmenu","fullmenu"],
+use: ".menu",
+desc: "Show all bot commands",
+category: "main",
+react: "🖥️",
+filename: __filename
 
 },
 
 async (conn, mek, m, { from, reply, userConfig }) => {
+
 
 try {
 
 
 const BOT_NAME = userConfig?.BOT_NAME || config.BOT_NAME || "Bot";
 const OWNER_NAME = userConfig?.OWNER_NAME || config.OWNER_NAME || "Owner";
+
 const PREFIX = config.PREFIX || ".";
 const MODE = config.MODE || "private";
 const VERSION = config.VERSION || "1.0.0";
 const DESCRIPTION = config.DESCRIPTION || "";
 
-
 const imageToUse = config.BOT_IMAGE;
 
 
-// 🎵 PUT YOUR MP3 LINK HERE
+
+// 🎵 AUDIO LINK
 
 const SONG_URL = "https://files.catbox.moe/uql9w6";
+
+
 
 
 
 const totalCommands = commands.length;
 
 
+
 const grouped = {};
 
-for (let i = 0; i < commands.length; i++) {
+for(let i=0;i<commands.length;i++){
 
 const c = commands[i];
 
 if(!c.category) continue;
 
+
 if(!grouped[c.category])
 grouped[c.category] = [];
+
 
 grouped[c.category].push(c);
 
 }
+
 
 
 const categories = Object.keys(grouped);
@@ -87,6 +97,7 @@ grouped[categories[i]]
 );
 
 }
+
 
 
 
@@ -109,18 +120,21 @@ ${menuSections}
 
 
 
-// MENU (NEWSLETTER STYLE)
+// MENU SEND
 
-await conn.sendMessage(from, {
+await conn.sendMessage(from,{
+
 
 image:{
 url:imageToUse
 },
 
+
 caption:dec,
 
 
 footer:`${BOT_NAME} Menu`,
+
 
 
 buttons:[
@@ -133,6 +147,7 @@ displayText:"📜 MENU"
 type:1
 },
 
+
 {
 buttonId:".owner",
 buttonText:{
@@ -140,6 +155,7 @@ displayText:"👤 OWNER"
 },
 type:1
 },
+
 
 {
 buttonId:".ping",
@@ -155,11 +171,14 @@ type:1
 
 contextInfo:{
 
+
 isForwarded:true,
 
 forwardingScore:999,
 
+
 forwardedNewsletterMessageInfo:{
+
 
 newsletterJid:"120363426829681935@newsletter",
 
@@ -167,9 +186,12 @@ newsletterName:"NawazTechX",
 
 serverMessageId:Date.now()
 
-}
 
 }
+
+
+}
+
 
 
 },{quoted:mek});
@@ -177,7 +199,8 @@ serverMessageId:Date.now()
 
 
 
-// 2 SECOND DELAY
+
+// WAIT 2 SECOND
 
 await new Promise(resolve=>setTimeout(resolve,2000));
 
@@ -185,9 +208,11 @@ await new Promise(resolve=>setTimeout(resolve,2000));
 
 
 
-// 🎵 NORMAL SONG STYLE AUDIO
 
-await conn.sendMessage(from, {
+// 🎵 SONG SEND
+
+
+await conn.sendMessage(from,{
 
 
 audio:{
@@ -197,12 +222,14 @@ url:SONG_URL
 
 mimetype:"audio/mpeg",
 
+fileName:"NawazTechX.mp3",
 
-// IMPORTANT
 ptt:false
 
 
+
 },{quoted:mek});
+
 
 
 
@@ -214,5 +241,6 @@ console.log(e);
 reply("Error : "+e);
 
 }
+
 
 });
