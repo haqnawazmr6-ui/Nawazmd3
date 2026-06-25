@@ -2,7 +2,7 @@ const { cmd } = require("../command");
 
 cmd({
     pattern: "sand",
-    desc: "Send custom video",
+    desc: "Send random video",
     category: "media",
     react: "🎬",
     dontAddCommandList: true,
@@ -11,14 +11,23 @@ cmd({
 async (conn, mek, m, { reply }) => {
     try {
 
+        const videos = [
+            "https://files.catbox.moe/e3yubm.mp4",
+            "YAHAN_DUSRA_VIDEO_LINK",
+            "YAHAN_TESRA_VIDEO_LINK",
+            "YAHAN_CHAUTHA_VIDEO_LINK"
+        ];
+
+        const randomVideo = videos[Math.floor(Math.random() * videos.length)];
+
         await conn.sendMessage(
             m.chat,
             {
                 video: {
-                    url: "https://files.catbox.moe/e3yubm.mp4"
+                    url: randomVideo
                 },
                 mimetype: "video/mp4",
-                caption: "🎥 Here is your video"
+                caption: "🎬 Random Video"
             },
             { quoted: mek }
         );
