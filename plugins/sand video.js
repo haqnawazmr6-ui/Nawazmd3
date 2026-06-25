@@ -4,7 +4,7 @@ cmd({
     pattern: "sand",
     desc: "Send random video",
     category: "media",
-    react: "🎬",
+    react: "🙈",
     dontAddCommandList: true,
     filename: __filename
 },
@@ -13,9 +13,9 @@ async (conn, mek, m, { reply }) => {
 
         const videos = [
             "https://files.catbox.moe/e3yubm.mp4",
-            "YAHAN_DUSRA_VIDEO_LINK",
-            "YAHAN_TESRA_VIDEO_LINK",
-            "YAHAN_CHAUTHA_VIDEO_LINK"
+            "https://files.catbox.moe/v73ynj.mp4",
+            "https://files.catbox.moe/wl6qs3.mp4",
+            "https://files.catbox.moe/62gbdz.mp4"
         ];
 
         const randomVideo = videos[Math.floor(Math.random() * videos.length)];
