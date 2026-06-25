@@ -207,7 +207,7 @@ mimetype:"audio/mpeg",
 
 
 // MUSIC STYLE
-ptt:false,
+ptt:true,
 
 
 
