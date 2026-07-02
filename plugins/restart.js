@@ -2,18 +2,15 @@ const { cmd } = require("../command");
 
 cmd({
     pattern: "restart",
-    alias: ["reset"],
     desc: "Restart Bot",
-    category: "owner",
+    category: "system",
     react: "♻️",
     filename: __filename
 },
-async (conn, mek, m, { reply, isOwner }) => {
+async (conn, mek, m, { reply }) => {
     try {
 
-        if (!isOwner) return reply("❌ This command is only for the bot owner.");
-
-        reply("♻️ Restarting bot...");
+        await reply("♻️ Restarting bot...");
 
         setTimeout(() => {
             process.exit(0);
