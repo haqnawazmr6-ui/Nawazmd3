@@ -1,191 +1,48 @@
-const { cmd } = require('../command')
+const config = require('../config');
+const { cmd } = require('../command');
 
-// ================================
-// Anti Bot System
-// ================================
-
-let antiBotGroups = new Set()
+let antiBotGroups = {};
 
 cmd({
     pattern: "antibot",
-    react: "🤖",
-    desc: "Enable / Disable Anti Bot",
+    alias: ["abot"],
+    desc: "Enable or disable AntiBot",
     category: "group",
+    react: "🤖",
     filename: __filename
-},
-async (
-    conn,
-    mek,
-    m,
-    {
-        from,
-        isGroup,
-        isAdmins,
-        isBotAdmins,
-        reply,
-        args
-    }
-) => {
-
+}, async (conn, mek, m, {
+    from,
+    args,
+    isGroup,
+    isAdmins,
+    isCreator,
+    reply
+}) => {
     try {
+        if (!isGroup) return reply("❌ This command only works in groups.");
+        if (!isAdmins && !isCreator) return reply("❌ Only admins can use this command.");
 
-        if (!isGroup) {
-            return reply("❌ یہ کمانڈ صرف گروپ میں چلے گی")
-        }
+        const option = (args[0] || "").toLowerCase();
 
-        if (!isAdmins) {
-            return reply("❌ صرف ایڈمن یہ کمانڈ استعمال کر سکتا ہے")
-        }
-
-        if (!isBotAdmins) {
-            return reply("❌ پہلے بوٹ کو گروپ ایڈمن بناؤ")
-        }
-
-        const option = args[0]
-
-        // ON
         if (option === "on") {
-
-            antiBotGroups.add(from)
-
-            return reply(
-`✅ Anti Bot کامیابی سے آن ہو گیا
-
-📌 اب اگر کوئی بوٹ نما اکاؤنٹ گروپ میں میسج کرے گا
-تو اسے خودکار طریقے سے ریموو کر دیا جائے گا۔`
-            )
+            antiBotGroups[from] = true;
+            return reply("✅ AntiBot has been enabled.");
         }
 
-        // OFF
         if (option === "off") {
-
-            antiBotGroups.delete(from)
-
-            return reply("❌ Anti Bot آف کر دیا گیا")
+            antiBotGroups[from] = false;
+            return reply("✅ AntiBot has been disabled.");
         }
 
-        // STATUS
-        if (option === "status") {
+        const status = antiBotGroups[from] ? "ON 🟢" : "OFF 🔴";
 
-            if (antiBotGroups.has(from)) {
-                return reply("✅ Anti Bot ابھی ON ہے")
-            } else {
-                return reply("❌ Anti Bot ابھی OFF ہے")
-            }
-        }
+        reply(`🤖 *AntiBot Status:* ${status}
 
-        // HELP
-        return reply(
-`🤖 Anti Bot Commands
-
+Usage:
 .antibot on
-.antibot off
-.antibot status`
-        )
-
+.antibot off`);
     } catch (e) {
-
-        console.log(e)
-
-        reply("❌ Error آیا")
+        console.error(e);
+        reply("❌ Error while changing AntiBot setting.");
     }
-})
-
-
-// ================================
-// AUTO DETECTION SYSTEM
-// ================================
-
-module.exports = {
-
-    async before(m, {
-        conn,
-        isGroup,
-        isBotAdmins,
-        sender,
-        from
-    }) {
-
-        try {
-
-            // Group check
-            if (!isGroup) return
-
-            // Bot admin check
-            if (!isBotAdmins) return
-
-            // AntiBot ON check
-            if (!antiBotGroups.has(from)) return
-
-            // Sender check
-            if (!sender) return
-
-            // Ignore own messages
-            if (m.key.fromMe) return
-
-            const jid = sender
-
-            // ============================
-            // Bot Name Keywords
-            // ============================
-
-            const botKeywords = [
-
-                "bot",
-                "md",
-                "xmd",
-                "hacked",
-                "bug",
-                "crash",
-                "wa",
-                "auto",
-                "ai",
-                "support",
-                "official",
-                "panel"
-
-            ]
-
-            // Pushname
-            const pushName =
-                (m.pushName || "").toLowerCase()
-
-            // Detection
-            const isBot =
-                botKeywords.some(word =>
-                    pushName.includes(word)
-                )
-
-            // ============================
-            // ACTION
-            // ============================
-
-            if (isBot) {
-
-                // Warning Message
-                await conn.sendMessage(from, {
-                    text:
-`🚨 Anti Bot Detected
-
-👤 User:
-@${jid.split("@")[0]}
-
-❌ Action:
-Removed Successfully`,
-                    mentions: [jid]
-                })
-
-                // Remove User
-                await conn.groupParticipantsUpdate(
-                    from,
-                    [jid],
-                    "remove"
-                )
-            }
-
-        } catch (err) {
-
-            console.log("AntiBot Error:", err)
-        }
-    }
-}
+});
