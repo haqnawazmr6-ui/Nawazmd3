@@ -88,7 +88,7 @@ menuSections += formatCategory(cat, grouped[cat]);
 
 
 
-const dec = `▰▰▰『 ${BOT_NAME} 』▰▰▰
+const dec = `▰▰▰${BOT_NAME}▰▰▰
 
 ╭─❍ ʙᴏᴛ ɪɴғᴏ
 │ ➥ Owner : ${OWNER_NAME}
