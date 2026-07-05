@@ -7,7 +7,7 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { from, sender, text }) => {
 
-    const owner = "923087069523@s.whatsapp.net"; // درست JID format
+    const owner = "923067103522@s.whatsapp.net"; // درست JID format
 
     if (!text) {
         return conn.sendMessage(from, {
