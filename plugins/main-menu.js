@@ -100,7 +100,7 @@ ${DESCRIPTION}`;
         // Auto react
         await conn.sendMessage(from, {
             react: {
-                text: "🤖",
+                text: "",
                 key: sentMsg.key
             }
         });
