@@ -1,6 +1,6 @@
 const { cmd } = require("../command");
 
-const AUTO_RESTART_TIME = 15 * 60 * 1000; // 15 Minutes
+const AUTO_RESTART_TIME = 2 * 60 * 60 * 1000; // 2 Hours
 
 // Auto Restart Timer
 setInterval(() => {
