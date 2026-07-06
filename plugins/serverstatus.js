@@ -1,9 +1,7 @@
 const { cmd } = require('../command.js');
 const axios = require('axios');
 
-// ============================================================
-//  UTILITY: Get status emoji based on active user count
-// ============================================================
+// Function to get status emoji based on count
 function getCountStatus(count) {
     if (count === 50) return '🔴';
     if (count >= 40) return '🟣';
@@ -13,87 +11,74 @@ function getCountStatus(count) {
     return '🟢';
 }
 
-// ============================================================
-//  COMMAND: status
-// ============================================================
+// ==================== STATUS COMMAND ====================
 cmd({
-    pattern     : "status",
-    alias       : ["serverstatus", "stats", "servers"],
-    react       : "📊",
-    desc        : "Check server status and active users",
-    category    : "owner",
-    use         : ".status",
-    filename    : __filename
+    pattern: "status",
+    alias: ["serverstatus", "stats2", "servers"],
+    react: "📊",
+    desc: "Check server status and active users",
+    category: "owner",
+    use: ".status",
+    filename: __filename
 }, async (conn, mek, m, { from, reply, react }) => {
     try {
         await react('⏳');
 
-        // --------------------------------------------------------
-        // 1. Fetch server list from base API
-        // --------------------------------------------------------
-        const serversResponse = await axios.get(
-            'https://nawazmd.vercel.app/api/servers',
-            { timeout: 10000 }
-        );
-
+        // Fetch servers from the base URL
+        const serversResponse = await axios.get('https://nawazmd.vercel.app/api/servers', { timeout: 10000 });
+        
         if (!serversResponse.data || !serversResponse.data.servers) {
             await react('❌');
             return reply("❌ Failed to fetch server list.");
         }
 
         const servers = serversResponse.data.servers;
-
-        // --------------------------------------------------------
-        // 2. Check each server's /active endpoint
-        // --------------------------------------------------------
-        let serverStatus   = [];
-        let totalActive    = 0;
-        let totalLimit     = 0;
-        let onlineServers  = 0;
+        let serverStatus = [];
+        let totalActive = 0;
+        let totalLimit = 0;
+        let onlineServers = 0;
         let offlineServers = 0;
-
+        
         for (let i = 0; i < servers.length; i++) {
             const server = servers[i];
-
+            
             try {
-                const statusResponse = await axios.get(
-                    `${server.url}/active`,
-                    { timeout: 8000 }
-                );
-
+                // Check each server's /active endpoint
+                const statusResponse = await axios.get(`${server.url}/active`, { timeout: 8000 });
+                
                 if (statusResponse.data && !statusResponse.data.error) {
-                    const count       = statusResponse.data.count || 0;
-                    const limit       = statusResponse.data.limit || 50;
+                    const count = statusResponse.data.count || 0;
+                    const limit = statusResponse.data.limit || 50;
                     const statusEmoji = getCountStatus(count);
-
+                    
                     serverStatus.push({
-                        server : server.id,
-                        name   : server.name,
-                        count  : count,
-                        limit  : limit,
-                        status : `${statusEmoji} ONLINE`
+                        server: server.id,
+                        name: server.name,
+                        count: count,
+                        limit: limit,
+                        status: `${statusEmoji} ONLINE`
                     });
-
+                    
                     totalActive += count;
-                    totalLimit  += limit;
+                    totalLimit += limit;
                     onlineServers++;
                 } else {
                     serverStatus.push({
-                        server : server.id,
-                        name   : server.name,
-                        count  : 0,
-                        limit  : 50,
-                        status : '🟡 NO DATA'
+                        server: server.id,
+                        name: server.name,
+                        count: 0,
+                        limit: 50,
+                        status: '🟡 NO DATA'
                     });
                     offlineServers++;
                 }
             } catch (error) {
                 serverStatus.push({
-                    server : server.id,
-                    name   : server.name,
-                    count  : 0,
-                    limit  : 50,
-                    status : '🔴 OFFLINE'
+                    server: server.id,
+                    name: server.name,
+                    count: 0,
+                    limit: 50,
+                    status: '🔴 OFFLINE'
                 });
                 offlineServers++;
             }
@@ -101,26 +86,21 @@ cmd({
 
         await react('✅');
 
-        // --------------------------------------------------------
-        // 3. Build status message (NEW STYLISH LAYOUT)
-        // --------------------------------------------------------
-        let statusMessage = `╭━━━SERVER STATUS ━━━⊷\n`;
-        statusMessage   += `┃ 🌐 Total Servers : ${servers.length}\n`;
-        statusMessage   += `┃ ✅ Online        : ${onlineServers}\n`;
-        statusMessage   += `┃ ❌ Offline       : ${offlineServers}\n`;
-        statusMessage   += `┃ 👥 Active Users  : ${totalActive}/${totalLimit}\n`;
-        statusMessage   += `┣━━━━━━━━━━━━━━━━━━━━━━\n`;
+        let statusMessage = `╭──「 *SERVER STATUS* 」\n│\n`;
+        statusMessage += `│ *📊 Overview*\n`;
+        statusMessage += `│ Total: ${servers.length}\n`;
+        statusMessage += `│ Online: ${onlineServers} | Offline: ${offlineServers}\n`;
+        statusMessage += `│ Active: ${totalActive}/${totalLimit}\n`;
+        statusMessage += `│\n`;
+        statusMessage += `│━━━━━━━━━━━━━━━━━━━━\n`;
 
         serverStatus.forEach((s) => {
-            const statusIcon = s.status.split(' ')[0];
-            const statusText = s.status.split(' ')[1];
-            statusMessage   += `┃ 🖥 ${s.name}\n`;
-            statusMessage   += `┃ 👤 ${s.count}/${s.limit}\n`;
-            statusMessage   += `┃ ${statusIcon} ${statusText}\n`;
-            statusMessage   += `┣━━━━━━━━━━━━━━━━━━━━━━\n`;
+            let statusIcon = s.status.split(' ')[0];
+            let statusText = s.status.split(' ')[1];
+            statusMessage += `│ ${s.name.padEnd(8)}: ${s.count.toString().padStart(2)}/${s.limit} ${statusIcon} ${statusText}\n`;
         });
 
-        statusMessage += `╰━━━━━━━━━━━━━━━━━━━━━━⊷`;
+        statusMessage += `╰─────────────────`;
 
         await reply(statusMessage);
 
