@@ -2,7 +2,7 @@ const { cmd } = require('../command');
 
 cmd({
     pattern: "alive",
-    alias: ["status", "runtime"],
+    alias: ["alive1", "runtime"],
     desc: "Alive message",
     category: "main",
     react: "⚡",
@@ -13,7 +13,33 @@ async (conn, mek, m, { from }) => {
     try {
 
         await conn.sendMessage(from, {
-            text: `🟢 NAWAZ MD ONLINE ⚡ BOT ACTIVE ✔`,
+            text: `╭━━━〔 ⚡ 𝗡𝗔𝗪𝗔𝗭 𝗠𝗗 ⚡ 〕━━━⬣
+
+> 🟢 BOT STATUS : ONLINE
+> ⚡ SYSTEM : ACTIVE
+> 🚀 SPEED : STABLE
+> 🔰 MODE : PUBLIC
+> 💻 ENGINE : WHATSAPP MD
+
+━━━━━━━━━━━━━━━━━━
+
+✨ Welcome To NAWAZ MD
+
+🤖 Your bot has been started successfully and is now online.
+
+📌 All commands are active and working perfectly.
+
+⚙️ Enjoy fast performance, smooth response and powerful features.
+
+💡 Type *.menu* to explore all available commands.
+
+❤️ Thank you for choosing NAWAZ MD.
+We hope you enjoy the best WhatsApp Bot experience.
+
+━━━━━━━━━━━━━━━━━━
+
+👑 POWERED BY NAWAZ TECH
+╰━━━━━━━━━━━━━━━━━━⬣`,
             contextInfo: {
                 isForwarded: true,
                 forwardingScore: 999,
@@ -27,7 +53,9 @@ async (conn, mek, m, { from }) => {
 
     } catch (e) {
         console.log(e);
-        conn.sendMessage(from, { text: "❌ Error in alive command" });
+        await conn.sendMessage(from, {
+            text: "❌ Error in alive command"
+        }, { quoted: mek });
     }
 
 });
