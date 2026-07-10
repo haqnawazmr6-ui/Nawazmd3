@@ -1,7 +1,7 @@
 const { cmd } = require("../command");
 
 cmd({
-    pattern: "king",
+    pattern: "owner",
     alias: ["owner1", "owner2"],
     desc: "Owner Telegram",
     category: "main",
