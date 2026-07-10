@@ -1,8 +1,9 @@
-const { cmd } = require('../command');
+const { cmd } = require("../command");
 
 cmd({
-    pattern: "owner",
-    desc: "Show Owner Telegram",
+    pattern: "king",
+    alias: ["owner1", "owner2"],
+    desc: "Owner Telegram",
     category: "main",
     react: "💀",
     filename: __filename
@@ -14,12 +15,15 @@ cmd({
         await sock.sendPresenceUpdate("composing", from);
 
         await sock.sendMessage(from, {
-            text: `╭──〔 👑 *OWNER* 〕──⬣
-│
-│ 🔗 *Telegram:*
-│ ${TELEGRAM}
-│
-╰────────────⬣`,
+            text: `╭━━〔 👑 𝗢𝗪𝗡𝗘𝗥 〕━━⬣
+┃
+┃ 🔗 *Telegram*
+┃ ${TELEGRAM}
+┃
+┃ 💬 Contact me on Telegram
+┃ For Support & Help
+┃
+╰━━━━━━━━━━━━━━⬣`,
             contextInfo: {
                 isForwarded: true,
                 forwardingScore: 999,
