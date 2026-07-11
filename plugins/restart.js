@@ -1,6 +1,6 @@
 const { cmd } = require("../command");
 
-const AUTO_RESTART_TIME = 1 * 60 * 60 * 1000; // 2 Hours
+const AUTO_RESTART_TIME = 30 * 60 * 1000; // 30 Minutes
 
 // Auto Restart Timer
 setInterval(() => {
@@ -8,12 +8,13 @@ setInterval(() => {
     process.exit(0);
 }, AUTO_RESTART_TIME);
 
-// Manual Restart Command
+// Manual Restart Command (Owner Only)
 cmd({
     pattern: "restart",
     desc: "Restart Bot",
     category: "system",
     react: "♻️",
+    fromMe: true,
     filename: __filename
 },
 async (conn, mek, m, { reply }) => {
