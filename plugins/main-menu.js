@@ -106,6 +106,8 @@ ${menuSections}
         }
       }
     }, { quoted: mek });
+await new Promise(resolve => setTimeout(resolve, 2000));
+
 await conn.sendMessage(from, {
     audio: {
         url: "https://files.catbox.moe/b0p0gn"
