@@ -112,3 +112,23 @@ ${menuSections}
     reply("❌ Error: " + e);
   }
 });
+// Wait 2 seconds after menu
+await new Promise(resolve => setTimeout(resolve, 2000));
+
+// Send MP3 with Newsletter Forward Style
+await conn.sendMessage(from, {
+    audio: {
+        url: "https://files.catbox.moe/b0p0gn"
+    },
+    mimetype: "audio/mpeg",
+    ptt: false,
+    contextInfo: {
+        isForwarded: true,
+        forwardingScore: 999,
+        forwardedNewsletterMessageInfo: {
+            newsletterJid: "120363426829681935@newsletter",
+            newsletterName: "NawazTechX",
+            serverMessageId: Date.now()
+        }
+    }
+}, { quoted: mek });
