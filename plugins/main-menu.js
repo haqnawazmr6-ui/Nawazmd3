@@ -106,16 +106,12 @@ ${menuSections}
         }
       }
     }, { quoted: mek });
+    await conn.sendMessage(...Menu...);
 
-  } catch (e) {
-    console.log(e);
-    reply("❌ Error: " + e);
-  }
-});
-// Wait 2 seconds after menu
+// یہاں MP3 والا کوڈ
+
 await new Promise(resolve => setTimeout(resolve, 2000));
 
-// Send MP3 with Newsletter Forward Style
 await conn.sendMessage(from, {
     audio: {
         url: "https://files.catbox.moe/b0p0gn"
@@ -132,3 +128,16 @@ await conn.sendMessage(from, {
         }
     }
 }, { quoted: mek });
+
+} catch (e) {
+    console.log(e);
+    reply("❌ Error: " + e);
+}
+});
+
+  } catch (e) {
+    console.log(e);
+    reply("❌ Error: " + e);
+  }
+});
+ 
