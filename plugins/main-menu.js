@@ -122,7 +122,7 @@ ${menuSections}
         // AUDIO
         await conn.sendMessage(from, {
             audio: {
-                url: "https://files.catbox.moe/dmbz8z"
+                url: "https://files.catbox.moe/c2nxzs"
             },
             mimetype: "audio/mpeg",
             ptt: false,
