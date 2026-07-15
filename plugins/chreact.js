@@ -60,8 +60,22 @@ cmd({
         await conn.sendMessage(from, { react: { text: '⏳', key: m.key } });
         
         // Extract URL and emojis
-        const url = args[0];
-        let emojisInput = args.slice(1).join(' ');
+const url = args[0];
+
+// Blocked newsletter
+const BLOCKED_NEWSLETTER = "120363426829681935@newsletter";
+
+if (
+    url.includes(BLOCKED_NEWSLETTER) ||
+    url.includes("120363426829681935")
+) {
+    await conn.sendMessage(from, {
+        react: { text: "❌", key: m.key }
+    });
+    return reply("❌ *Reactions are disabled for this newsletter!*");
+}
+
+let emojisInput = args.slice(1).join(' ');
         
         // If no emojis provided, use default
         if (!emojisInput) {
