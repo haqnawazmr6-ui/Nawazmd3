@@ -1,73 +1,180 @@
+//---------------------------------------------------------------------------
+//           NAWAZ MD - YOUTUBE MUSIC DOWNLOADER
+//---------------------------------------------------------------------------
+
 const { cmd } = require("../command");
+const yts = require("yt-search");
 const axios = require("axios");
 
-cmd({
-    pattern: "play",
-    alias: ["song", "music", "s", "audio"],
-    desc: "Smart YouTube music downloader",
-    category: "music",
-    react: "🎧",
-    filename: __filename
-},
-async (conn, mek, m, { from, args, reply }) => {
+// Cache
+const cache = new Map();
 
+/**
+ * Normalize YouTube URL
+ */
+function normalizeYouTubeUrl(url) {
+    const match = url.match(
+        /(?:youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/.*[?&]v=)([a-zA-Z0-9_-]{11})/
+    );
+    return match ? `https://youtube.com/watch?v=${match[1]}` : null;
+}
+
+/**
+ * Get MP3 Download Link
+ */
+async function fetchAudio(url, retries = 2) {
     try {
+        const api = `https://jawad-tech.vercel.app/download/ytdl?url=${encodeURIComponent(
+            url
+        )}`;
 
-        if (!args[0]) {
-            return reply("❌ Song likho\nExample: .play faded");
+        const { data } = await axios.get(api, {
+            timeout: 20000,
+        });
+
+        if (data.status && data.result) {
+            return {
+                title: data.result.title || "Unknown Song",
+                audio: data.result.mp3,
+            };
         }
 
-        let query = encodeURIComponent(args.join(" "));
-        let api = `https://api-xemoz-official.my.id/api/donwloader/ytplay.php?q=${query}`;
-
-        let { data } = await axios.get(api, { timeout: 15000 });
-
-        if (!data?.status) {
-            return reply("❌ Song not found");
-        }
-
-        const result = data.result;
-
-        if (!result?.download?.audio) {
-            return reply("❌ Audio not found");
-        }
-
-        let title = result.title;
-        let channel = result.channel;
-        let duration = result.duration;
-        let thumb = result.thumbnail;
-        let audioUrl = result.download.audio;
-
-        let text = `
-╔═══❖•ೋ° 🎧 °ೋ•❖═══╗
-      NAWAZ-MD MUSIC
-╚═══❖•ೋ° 🎧 °ೋ•❖═══╝
-
-🎶 Song : ${title}
-👤 Channel : ${channel}
-⏱ Duration : ${duration}
-
-┏━━━━━━━━━━━━━━━┓
-┃ ⚡ Processing...
-┃ 🚀 Sending Audio...
-┃ 🎵 Enjoy Music
-┗━━━━━━━━━━━━━━━┛
-`.trim();
-
-        await conn.sendMessage(from, {
-            image: { url: thumb },
-            caption: text
-        }, { quoted: mek });
-
-        await conn.sendMessage(from, {
-            audio: { url: audioUrl },
-            mimetype: "audio/mp4",
-            ptt: false
-        }, { quoted: mek });
+        throw new Error("API Error");
 
     } catch (e) {
-        console.log(e);
-        reply("❌ Error in play command");
+
+        if (retries > 0) {
+            await new Promise(r => setTimeout(r, 2000));
+            return fetchAudio(url, retries - 1);
+        }
+
+        return null;
     }
+}
+
+cmd(
+{
+    pattern: "play",
+    alias: ["song", "music", "audio", "mp3"],
+    react: "🎵",
+    desc: "Download YouTube Audio",
+    category: "download",
+    filename: __filename,
+},
+    async (conn, mek, m, { from, q, reply, prefix, command }) => {
+
+try {
+
+if (!q) {
+return reply(`🎵 *Usage:* ${prefix + command} Faded`);
+}
+
+await conn.sendMessage(from, {
+react: {
+text: "🔍",
+key: mek.key
+}
+});
+
+const url = normalizeYouTubeUrl(q);
+
+let ytdata;
+
+if (url) {
+
+const search = await yts(q);
+ytdata = search.videos?.[0];
+
+} else {
+
+const search = await yts(q);
+
+if (!search.videos.length) {
+return reply("❌ Song not found!");
+}
+
+ytdata = search.videos[0];
+
+}
+
+const caption = `
+╭───────────────🎵
+│  *YOUTUBE MUSIC*
+╰───────────────
+
+🎶 *Title:* ${ytdata.title}
+
+👤 *Channel:* ${ytdata.author?.name || "Unknown"}
+
+⏱ *Duration:* ${ytdata.timestamp}
+
+👁 *Views:* ${ytdata.views.toLocaleString()}
+
+────────────────────
+⬇️ Downloading Audio...
+
+🚀 Powered by Nawaz MD
+`;
+
+await conn.sendMessage(from,{
+image:{url:ytdata.thumbnail || ytdata.image},
+caption
+},{quoted:mek});
+
+await conn.sendMessage(from,{
+react:{
+text:"⏳",
+key:mek.key
+}
+});
+
+const dlData = await fetchAudio(ytdata.url);
+
+if (!dlData || !dlData.audio){
+return reply("❌ Audio link not found!");
+}
+    try {
+
+const audioBuffer = await axios.get(dlData.audio,{
+responseType:"arraybuffer",
+timeout:60000
+});
+
+await conn.sendMessage(from,{
+audio:Buffer.from(audioBuffer.data),
+mimetype:"audio/mpeg",
+fileName:`${dlData.title}.mp3`,
+ptt:false
+},{quoted:mek});
+
+await conn.sendMessage(from,{
+react:{
+text:"✅",
+key:mek.key
+}
+});
+
+} catch(err){
+
+console.log("AUDIO SEND ERROR:",err.message);
+
+return reply("❌ Audio send failed!");
+
+}
+
+} catch(e){
+
+console.log("PLAY ERROR:",e);
+
+await conn.sendMessage(from,{
+react:{
+text:"❌",
+key:mek.key
+}
+});
+
+reply("⚠️ Something went wrong!");
+
+}
 
 });
